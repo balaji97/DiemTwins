@@ -1,0 +1,42 @@
+Timestamp: 2021-11-03 19:12:17.883821 | ProcessId: client_2 | Action: Initial configuration | Object: {'nvalidators': 4, 'nfaulty': 1, 'nclients': 3, 'nclientops': 4, 'sleeptime': 1, 'clienttimeout': 10, 'delta': 4, 'window_size': 5, 'exclude_size': 1, 'failure_config': FailureConfig(failures=[Failure(src='_', dest='_', msg_type=<MsgType.Proposal: 1>, round=4, prob=1, fail_type=<FailType.MsgLoss: 1>, val=None, attr=None), Failure(src='_', dest='_', msg_type=<MsgType.Timeout: 3>, round=4, prob=1, fail_type=<FailType.Delay: 2>, val=0, attr=None)], seed=637713655)} |
+Timestamp: 2021-11-03 19:12:17.919082 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_0', 'command': '2-0'}
+Timestamp: 2021-11-03 19:12:17.926780 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_1', 'command': '2-1'}
+Timestamp: 2021-11-03 19:12:17.933285 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_2', 'command': '2-2'}
+Timestamp: 2021-11-03 19:12:17.952637 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_3', 'command': '2-3'}
+Timestamp: 2021-11-03 19:12:18.381929 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_1 | Msg: {'req_id': '2_0', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:18.430657 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_2 | Msg: {'req_id': '2_0', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:18.431454 | ProcessId: client_2 | Action: Received f + 1 valid responses | Object: 2_0 |
+Timestamp: 2021-11-03 19:12:18.438503 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_3 | Msg: {'req_id': '2_0', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:18.438802 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_0 | Msg: {'req_id': '2_0', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:27.937628 | ProcessId: client_2 | Action: Retransmitting Request | Object: {'req_id': '2_1', 'command': '2-1'} |
+Timestamp: 2021-11-03 19:12:27.942904 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_1', 'command': '2-1'}
+Timestamp: 2021-11-03 19:12:27.957269 | ProcessId: client_2 | Action: Retransmitting Request | Object: {'req_id': '2_2', 'command': '2-2'} |
+Timestamp: 2021-11-03 19:12:27.959337 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_2', 'command': '2-2'}
+Timestamp: 2021-11-03 19:12:27.960828 | ProcessId: client_2 | Action: Retransmitting Request | Object: {'req_id': '2_3', 'command': '2-3'} |
+Timestamp: 2021-11-03 19:12:27.963153 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_3', 'command': '2-3'}
+Timestamp: 2021-11-03 19:12:37.951063 | ProcessId: client_2 | Action: Retransmitting Request | Object: {'req_id': '2_1', 'command': '2-1'} |
+Timestamp: 2021-11-03 19:12:37.952491 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_1', 'command': '2-1'}
+Timestamp: 2021-11-03 19:12:37.965184 | ProcessId: client_2 | Action: Retransmitting Request | Object: {'req_id': '2_2', 'command': '2-2'} |
+Timestamp: 2021-11-03 19:12:37.967346 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_2', 'command': '2-2'}
+Timestamp: 2021-11-03 19:12:37.968966 | ProcessId: client_2 | Action: Retransmitting Request | Object: {'req_id': '2_3', 'command': '2-3'} |
+Timestamp: 2021-11-03 19:12:37.969637 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_3', 'command': '2-3'}
+Timestamp: 2021-11-03 19:12:47.955306 | ProcessId: client_2 | Action: Retransmitting Request | Object: {'req_id': '2_1', 'command': '2-1'} |
+Timestamp: 2021-11-03 19:12:47.959770 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_1', 'command': '2-1'}
+Timestamp: 2021-11-03 19:12:47.974761 | ProcessId: client_2 | Action: Retransmitting Request | Object: {'req_id': '2_2', 'command': '2-2'} |
+Timestamp: 2021-11-03 19:12:47.975440 | ProcessId: client_2 | Action: Retransmitting Request | Object: {'req_id': '2_3', 'command': '2-3'} |
+Timestamp: 2021-11-03 19:12:47.978347 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_3', 'command': '2-3'}
+Timestamp: 2021-11-03 19:12:47.981007 | ProcessId: client_2 | Event: Sent | MsgType: Request | To: ALL validators | Msg: {'req_id': '2_2', 'command': '2-2'}
+Timestamp: 2021-11-03 19:12:50.596946 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_3 | Msg: {'req_id': '2_1', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.605502 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_1 | Msg: {'req_id': '2_1', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.605757 | ProcessId: client_2 | Action: Received f + 1 valid responses | Object: 2_1 |
+Timestamp: 2021-11-03 19:12:50.618105 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_0 | Msg: {'req_id': '2_1', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.646464 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_2 | Msg: {'req_id': '2_1', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.703609 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_1 | Msg: {'req_id': '2_2', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.714452 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_0 | Msg: {'req_id': '2_2', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.714684 | ProcessId: client_2 | Action: Received f + 1 valid responses | Object: 2_2 |
+Timestamp: 2021-11-03 19:12:50.747502 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_2 | Msg: {'req_id': '2_2', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.749741 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_3 | Msg: {'req_id': '2_2', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.750764 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_0 | Msg: {'req_id': '2_3', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.751937 | ProcessId: client_2 | Event: Received | MsgType: Response | From: validator_1 | Msg: {'req_id': '2_3', 'resp_status': 'success'}
+Timestamp: 2021-11-03 19:12:50.752221 | ProcessId: client_2 | Action: Received f + 1 valid responses | Object: 2_3 |
+Timestamp: 2021-11-03 19:12:50.752768 | ProcessId: client_2 | Event: Sent | MsgType: Done | To: parent_process | Msg: None
