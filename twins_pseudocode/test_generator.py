@@ -19,6 +19,9 @@ def generate_test_case(test_config):
 
     # Generate all possible partition scenarios as described in Step 1 of 4.2 in the Twins paper
     partition_scenarios = generate_partition_scenarios(validator_twin_ids, test_config.max_partitions)
+    # For each partition scenario, enumerate all possible intra-partition message drop scenarios
+    partition_scenarios = enumerate_partition_scenarios_with_drops(
+        partition_scenarios, test_config.n_message_drop_types)
     # Generates all possible leader partitions as described in Step 2 of 4.2 in the Twins paper
     all_leader_partitions = generate_leader_partitions(partition_scenarios, test_config.n_validators)
 
@@ -61,15 +64,11 @@ def generate_leader_partitions(partition_scenarios, n_validators):
     leader_partitions = []
     for partition_scenario in partition_scenarios:
         for leader in range(1, n_validators + 1):
-            dropped_message_scenarios = [[], ['ProposalMessage'], ['ProposalMessage', 'VoteMessage']]
-            for dropped_messages in dropped_message_scenarios:
-                # For every partition scenario, enumerate with all possible leaders,
-                # as well as all possible intra-partition drop message scenario
-                leader_partition = LeaderPartition()
-                leader_partition.leader = leader
-                leader_partition.partitions = partition_scenario
-                leader_partition.dropped_messages = dropped_messages
-                leader_partitions.append(leader_partition)
+            # For every partition scenario, enumerate with all possible leaders
+            leader_partition = LeaderPartition()
+            leader_partition.leader = leader
+            leader_partition.partitions = partition_scenario
+            leader_partitions.append(leader_partition)
 
     return leader_partitions
 
@@ -81,6 +80,12 @@ def generate_leader_partitions(partition_scenarios, n_validators):
 def generate_partition_scenarios(validator_twin_ids, max_partitions):
     return []
 
+
+# Returns a list of partitions after considering every partition to have up to n_message_drop_types
+# dropped intra-partition
+def enumerate_partition_scenarios_with_drops(partition_scenarios, n_message_drop_types):
+    # todo
+    return []
 
 # Checks if the validators in any of the partitions in the leader_partition can form a quorum
 def has_quorum(leader_partition, f):

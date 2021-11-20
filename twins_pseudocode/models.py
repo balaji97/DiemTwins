@@ -2,7 +2,9 @@ from typing import List
 
 
 class TestConfig:
-    # Number of rounds in the test case
+    # Number of test cases to generate
+    n_testcases: int
+    # Number of rounds in a test case
     n_rounds: int
     # Number of validators for the BFT
     n_validators: int
@@ -10,21 +12,31 @@ class TestConfig:
     n_twins: int
     # Maximum number of network partitions that will be created
     n_partitions: int
+    # Maximum number of message types that can be dropped intra-partition
+    n_intra_drop_types: int
     # Whether to generate test cases deterministically or not
     is_deterministic: bool
+    # Whether to repeat the same leader-partition scenario within a test case
+    is_with_replacement: bool
     # Seed for random number generator used for test cases
     seed: int
+    # Path at which we store the generated test cases
+    path: str
+
+
+class Partition:
+    # Types of messages from {ProposalMessage, VoteMessage, TimeoutMessage} that will be dropped
+    # within this partition
+    dropped_messages: List[str]
+    # List of twin_ids of validators that are a part of the network partition
+    partitions: List[str]
 
 
 class LeaderPartition:
     # Leader for that round
     leader: int
-    # List of lists. Each nested list represents a partition, which consists of twin_ids of validators that
-    # are a part of that network partition
-    partitions: List[List]
-    # List of messages(ProposalMessage, VoteMessage) that will be dropped within a partition.
-    # By default, none of the messages are dropped.
-    dropped_messages: List[str]
+    # List of network partitions for this LeaderPartition scenario
+    partitions: List[Partition]
 
 
 class TestCase:
