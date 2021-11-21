@@ -563,10 +563,10 @@ Prashant Srivastava, SBID 113166491: Network Playground, liveness check
 
 ## Thoughts on proposed changes to design for Phase 4
 
-* Logic for pruning out symmetric partitions.
-* Remove logic for ensuring quorum for every 3 rounds.
-* Allow TimeoutMessages to be dropped inter-partition and intra-partition as well. Add logic in network playground to allow TimeoutMessages for a round after f+1 validators timeout in that round.
-* Allow users to limit types of messages dropped intra-partition.
+* Logic for pruning out symmetric partitions. - todo
+* Remove logic for ensuring quorum for every 3 rounds. - done
+* Allow TimeoutMessages to be dropped inter-partition and intra-partition as well. Add logic in network playground to allow TimeoutMessages for a round after f+1 validators timeout in that round. - todo
+* Allow users to limit types of messages dropped intra-partition. - done
 * Make explicit that we are no longer spawning clients.
-* Test generator takes the test config from the user and generates all possible testcases and saves it to a file. Test executor then loads all testcases from a file sequentially and executes them.
-* Include liveness check for no blocks dropped in between. Need all validators to dump pending block tree to file along with ledger
+* Test generator takes the test config from the user and generates all possible testcases and saves it to a file. Test executor then loads all testcases from a file sequentially and executes them. - done
+* Include liveness check for no blocks dropped in between. Need all validators to dump pending block tree to file along with ledger - todo

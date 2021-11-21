@@ -2,10 +2,10 @@ from twins.validator import TwinsValidator
 
 
 class TestExecutor:
-    def execute(self, test_configs):
-        for test_config in test_configs:
-            # Pass the config to test_generator and generate the test case
-            test_case = self.test_generator.generate_test_case(test_config)
+    def execute(self, test_case_path):
+        test_cases = read_test_cases(test_case_path)
+
+        for test_case in test_cases:
 
             # Spawn the network playground with the generated test case
             network_playground = new(NetworkPlayground, num=1)
@@ -68,3 +68,9 @@ class TestExecutor:
 
             # Generate test report
             reporting.generate_test_report(test_config, test_case, safety_check, liveness_check)
+
+
+    # Reads and returns a list of all test cases stored in test_case_path directory
+    def read_test_cases(self, test_case_path):
+        # todo
+        return []
