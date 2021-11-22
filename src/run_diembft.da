@@ -7,7 +7,8 @@ sys.path.append('../config')
 from client import Client
 from config import configs
 from cryptography import Cryptography
-from validator import ValidatorFI
+from validator_twins import ValidatorTwins
+from network_playground import NetworkPlayground
 
 
 class RunDiemBFT(process):
@@ -27,8 +28,11 @@ class RunDiemBFT(process):
         os.makedirs('../logs/config' + str(config_id))
         os.makedirs('../ledgers/config' + str(config_id))
 
-        validators = new(ValidatorFI, num=nvalidators)
+        validators = new(ValidatorTwins, num=nvalidators)
         clients = new(Client, num=nclients)
+
+        network_playground = new(NetworkPlayground, num=1)
+        setup(network_playground, ([],))
 
         for v in validators:
             private_key, public_key = Cryptography.generate_key()
@@ -42,18 +46,20 @@ class RunDiemBFT(process):
 
         for i, v in enumerate(validators):
             setup({v}, (config, config_id, i, list(validators), list(clients),
-                        private_keys_validators[v], public_keys_validators, public_keys_clients))
+                        private_keys_validators[v], public_keys_validators, public_keys_clients, network_playground))
 
         for i, c in enumerate(clients):
             setup({c}, (config, config_id, i, list(validators),
                         private_keys_clients[c], public_keys_validators))
 
+        start(network_playground)
         start(validators)
         start(clients)
 
         await(each(c in clients, has=received(('Done',), from_=c)))
         output("All clients done, informing all validators.", config_id)
         send(('Done',), to=validators)
+        send(('Done',), to=network_playground)
 
 
 def is_config_valid(config):

@@ -1,0 +1,6 @@
+from validator import Validator
+
+class ValidatorTwins(process, Validator):
+    def send(payload, to):
+        message_type, message = payload
+        super().send(('ValidatorMessage', "todo", "todo", to, "todo", message_type, message), to=network_playground)

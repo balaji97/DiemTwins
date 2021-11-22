@@ -1,0 +1,18 @@
+class NetworkPlayground(process):
+    def setup(test_case):
+        # All validator IDs that have reached a particular round
+        self.validators_at_round = dict()
+        # All validator IDs that have timed out at a particular round
+        self.timeouts_at_round = dict()
+
+    def run():
+        # todo
+        await(received(('Done',), from_=parent()))
+
+    def receive(msg=('ValidatorMessage', from_twin_validator_id, to_twin_validator_id, to_process, round_num, message_type, message), from_ = from_process):
+        if can_send(from_twin_validator_id, to_twin_validator_id):
+            send((message_type, message, from_process), to=to_process)
+
+    def can_send(from_twin_validator_id, to_twin_validator_id):
+        # todo
+        return True

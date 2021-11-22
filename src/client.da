@@ -52,7 +52,7 @@ class Client(process):
         send(('Done',), to=parent())
         LOGGER.log_event("Sent", "Done", None, parent())
 
-    def receive(msg=('Response', resp), from_=validator):
+    def receive(msg=('Response', resp, validator), from_=_):
         LOGGER.log_event("Received", "Response", resp, validator)
 
         req_id = resp['req_id']
