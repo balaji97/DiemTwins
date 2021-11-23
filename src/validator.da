@@ -11,7 +11,7 @@ from safety import Safety
 
 class Validator (process):
 
-    def setup(config, config_id: int, validator_id: int, replicas: list, private_key, public_keys_validators, network_playground):
+    def setup(config, config_id: int, validator_id: int, replicas: list, private_key, public_keys_validators, test_case):
 
         LOGGER.replicas = replicas
         LOGGER.process_id = "validator_" + str(validator_id)
@@ -59,7 +59,7 @@ class Validator (process):
         self.pacemaker.stop_timer(self.pacemaker.current_round)
         output("Validator", self.validator_id, "is exiting")
 
-        super().send(('Done',), to=parent())
+        send(('Done',), to=parent())
 
     '''Procedure process certificate qc(qc)'''
     def process_certificate_qc(qc):
@@ -70,18 +70,12 @@ class Validator (process):
 
         LOGGER.log('Validator: process_certificate_qc recent_committed_block', len(
             self.recently_committed_block_ids))
-        # Send responses to the requests which were recently committed
+
+        # Move recently committed blocks to request cache
         if len(self.recently_committed_block_ids) > 0:
             for block_id in self.recently_committed_block_ids:
                 for txn in self.id_block[block_id].payload:
-                    request_id = txn['req_id']
-                    resp = {
-                        'req_id': request_id,
-                        'resp_status': "success"
-                    }
-                    # send(('Response', resp), to=txn['client'])
-                    # LOGGER.log_event("Sent", "Response", resp, txn['client'])
-                    self.request_cache[request_id] = resp
+                    self.request_cache[txn['req_id']] = {}
             self.recently_committed_block_ids.clear()
 
         '''Pacemaker.advance round(qc.vote info.round)'''
@@ -116,7 +110,7 @@ class Validator (process):
         LOGGER.log("Validator: process_new_round_event ends", None)
 
     '''Procedure process proposal msg(P)'''
-    def receive(msg=('Proposal', proposal_msg, p), from_=_):
+    def receive(msg=('Proposal', proposal_msg), from_=p):
         LOGGER.log_event("Received", "Proposal", proposal_msg, p)
 
         signature_verified = Cryptography.get_verified_message(
@@ -165,7 +159,7 @@ class Validator (process):
             LOGGER.log_action("Verified ProposalMsg signature", False)
 
     '''Procedure process vote msg(M)'''
-    def receive(msg=('Vote', vote_msg, p), from_=_):
+    def receive(msg=('Vote', vote_msg), from_=p):
         LOGGER.log_event("Received", "Vote", vote_msg, p)
 
         signature_verified = Cryptography.get_verified_message(
@@ -189,7 +183,7 @@ class Validator (process):
         LOGGER.log("Received VoteMsg ends g", None)
 
     '''Procedure process timeout msg(M)'''
-    def receive(msg=('Timeout', timeout_msg, p), from_=_):
+    def receive(msg=('Timeout', timeout_msg), from_=p):
         LOGGER.log_event("Received", "Timeout", timeout_msg, p)
 
         signature_verified = Cryptography.get_verified_message(

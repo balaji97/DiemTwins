@@ -2,5 +2,24 @@ from validator import Validator
 
 class ValidatorTwins(process, Validator):
     def send(payload, to):
+        message_type = payload[0]
+
+        if not should_partition(message_type, self.pacemaker.current_round):
+            super().send(payload, to=to)
+            return
+
         message_type, message = payload
-        super().send(('ValidatorMessage', "todo", "todo", to, "todo", message_type, message), to=network_playground)
+
+
+    def should_partition(message_type, round_num):
+        return False
+
+        # todo
+        if round_num > test_case.n_rounds or message_type not in {'Proposal', 'Vote', 'Timeout'}:
+            return False
+
+        if message_type in {'Proposal', 'Vote'}:
+            return True
+        else:
+            # todo
+            return False

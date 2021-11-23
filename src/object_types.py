@@ -175,11 +175,19 @@ class ProposalMsg:
         self.signature = Cryptography.sign_message(self.block.id)
 
 
-class LeaderPartition:
-    leader: int
+class Partition:
+    dropped_messages: list
     partitions: list
 
-    def __init__(self, leader: int, partitions: list):
+    def __init__(self, dropped_messages, partitions):
+        self.dropped_messages = dropped_messages
+        self.partitions = partitions
+
+class LeaderPartition:
+    leader: int
+    partitions: List[Partition]
+
+    def __init__(self, leader: int, partitions: List[Partition]):
         self.leader = leader
         self.partitions = partitions
 

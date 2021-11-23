@@ -1,11 +1,10 @@
 import os
 import shutil
 
-from object_types import TestCase, LeaderPartition
+from object_types import TestCase, LeaderPartition, Partition
 
 from cryptography import Cryptography
 from validator_twins import ValidatorTwins
-from network_playground import NetworkPlayground
 
 class TestExecutor(process):
     def setup(test_case, test_id):
@@ -23,9 +22,6 @@ class TestExecutor(process):
         os.makedirs('../ledgers/config' + str(test_id))
 
         validators = new(ValidatorTwins, num=n_validators)
-
-        network_playground = new(NetworkPlayground, num=1)
-        setup(network_playground, (test_case,))
 
         for v in validators:
             private_key, public_key = Cryptography.generate_key()
@@ -48,14 +44,12 @@ class TestExecutor(process):
 
         for i, v in enumerate(validators):
             setup({v}, (validator_config, test_id, i, list(validators),
-                        private_keys_validators[v], public_keys_validators, network_playground))
+                        private_keys_validators[v], public_keys_validators, test_case))
 
-        start(network_playground)
         start(validators)
 
         await(each(v in validators, has=received(('Done',), from_=v)))
         output("All validators done.")
-        send(('Done',), to=network_playground)
 
 
 
@@ -73,16 +67,16 @@ def main():
             n_rounds= 10,
             n_validators=4,
             leader_partitions=[
-                LeaderPartition(0, []),
-                LeaderPartition(0, []),
-                LeaderPartition(0, []),
-                LeaderPartition(0, []),
-                LeaderPartition(1, []),
-                LeaderPartition(1, []),
-                LeaderPartition(1, []),
-                LeaderPartition(1, []),
-                LeaderPartition(2, []),
-                LeaderPartition(3, [])
+                LeaderPartition(0, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
+                LeaderPartition(0, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
+                LeaderPartition(0, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
+                LeaderPartition(1, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
+                LeaderPartition(1, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
+                LeaderPartition(1, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
+                LeaderPartition(2, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
+                LeaderPartition(2, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
+                LeaderPartition(3, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
+                LeaderPartition(3, [Partition([], [(0, False), (1, False), (2, False), (3, False)])])
             ],
             twin_ids=[]
         )
