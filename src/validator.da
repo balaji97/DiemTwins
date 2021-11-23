@@ -88,7 +88,7 @@ class Validator (process):
         LOGGER.log('Validator: process_new_round_event', last_tc)
 
         '''if u = LeaderElection.get leader(Pacemaker.current round) then'''
-        if self.replicas[validator_id] == self.leader_election.get_leader(self.pacemaker.current_round):
+        if self.validator_id == self.leader_election.get_leader(self.pacemaker.current_round):
 
             '''b ← Block-Tree.generate block( MemPool.get transactions(),
                     Pacemaker.current round )'''
@@ -133,7 +133,7 @@ class Validator (process):
             '''round ← Pacemaker.current round'''
             round = self.pacemaker.current_round
             '''leader ← LeaderElection.get leader(current round)'''
-            leader = self.leader_election.get_leader(round)
+            leader = self.replicas[self.leader_election.get_leader(round)]
             '''if P.block.round 6= round ∨ P.sender 6= leader ∨ P.block.author 6= leader then
                     return'''
             if proposal_msg.block.round != round or replicas[proposal_msg.sender] != leader or replicas[proposal_msg.block.author] != leader:
@@ -150,7 +150,7 @@ class Validator (process):
             '''if vote msg != ⊥ then
                     send vote msg to LeaderElection.get leader(current round + 1)'''
             if vote_msg is not None:
-                next_leader = self.leader_election.get_leader(round + 1)
+                next_leader = self.replicas[self.leader_election.get_leader(round + 1)]
                 send(('Vote', vote_msg),
                      to=next_leader)
                 LOGGER.log_event("Sent", "Vote", vote_msg, next_leader)

@@ -28,9 +28,9 @@ class TestExecutor(process):
             private_keys_validators[v] = private_key
             public_keys_validators[v] = public_key
 
-        for validator_id, validator in enumerate(validators):
+        for validator_id, _ in enumerate(validators):
             if validator_id not in test_case.twin_ids:
-                default_leader = validator
+                default_leader = validator_id
                 break
 
         validator_config = {
@@ -38,7 +38,7 @@ class TestExecutor(process):
             "nvalidators": self.n_validators,
             "nfaulty": self.n_faulty,
             "delta": self.delta,
-            "leaders": [list(validators)[leader_partition.leader] for leader_partition in test_case.leader_partitions],
+            "leaders": [leader_partition.leader for leader_partition in test_case.leader_partitions],
             "default_leader": default_leader
         }
 
