@@ -68,8 +68,11 @@ class Pacemaker:
                 timeout_info, self.last_round_tc, self.blocktree.high_commit_qc)
             LOGGER.log("Timeout Msg parameters", timeout_info,
                        self.last_round_tc, self.blocktree.high_commit_qc)
+
             # Broadcast the timeout message
             self.send_timeout_msg(timeout_msg)
+            # Restart timer for current round for timeout message retransmission in case timeout message drops
+            self.start_timer(self.current_round)
 
     '''Function process remote timeout(tmo)'''
 
@@ -101,8 +104,6 @@ class Pacemaker:
             local timeout round() // Bracha timeout'''
         if len(self.tmo_senders[tmo_info.round]) == self.f + 1:
             # self.stop_timer(self.current_round)
-            #Restart timer for current round for timeout message retransmission in case timeout message drops
-            self.start_timer(self.current_round)
             self.local_timeout_round()  # Bracha timeout
 
         '''if |pending timeouts[tmo info.round].senders| == 2f + 1 then'''
