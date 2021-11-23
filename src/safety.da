@@ -5,7 +5,7 @@ from object_types import LedgerCommitInfo, TimeoutInfo, VoteInfo, VoteMsg
 
 class Safety:
 
-    def __init__(self, validator_id, replicas, ledger, blocktree):
+    def __init__(self, validator_id, ledger, blocktree):
         '''private key; // Own private key
         public keys; // Public keys of all validators
         highest vote round; // initially 0
@@ -13,7 +13,6 @@ class Safety:
         self.__highest_vote_round = 0
         self.__highest_qc_round = 0
         self.validator_id = validator_id
-        self.validator = replicas[validator_id]
         self.ledger = ledger
         self.blocktree = blocktree
 

@@ -6,7 +6,7 @@ from object_types import TC, TimeoutMsg
 
 class Pacemaker:
 
-    def __init__(self, validator_id, replicas, blocktree, safety, nfaulty, delta, send_timeout_msg):
+    def __init__(self, validator_id, blocktree, safety, nfaulty, delta, send_timeout_msg):
         '''current round; // Initially zero
         last round tc; // Initially ⊥
         pending timeouts ; // Timeouts per rounda'''
@@ -21,11 +21,9 @@ class Pacemaker:
 
         self.f = nfaulty
         self.delta = delta
-        self.validator = replicas[validator_id]
         self.validator_id = validator_id
         self.blocktree = blocktree
         self.safety = safety
-        self.replicas = replicas
         self.send_timeout_msg = send_timeout_msg
 
     '''Function get round timer(r)'''

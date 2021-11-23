@@ -28,11 +28,11 @@ class Validator (process):
         self.ledger = Ledger(
             config_id, validator_id, self.id_block, self.recently_committed_block_ids, self.request_cache)
         self.blocktree = BlockTree(
-            validator_id, replicas, self.ledger, config['nfaulty'], self.id_block)
-        self.safety = Safety(validator_id, replicas,
+            validator_id, self.ledger, config['nfaulty'], self.id_block)
+        self.safety = Safety(validator_id,
                              self.ledger, self.blocktree)
         self.pacemaker = Pacemaker(
-            validator_id, replicas, self.blocktree, self.safety, config['nfaulty'], config['delta'], send_timeout_msg)
+            validator_id, self.blocktree, self.safety, config['nfaulty'], config['delta'], send_timeout_msg)
         self.mempool = MemPool(validator_id)
         self.leader_election = LeaderElection(config['leaders'], config['default_leader'])
 

@@ -5,7 +5,7 @@ from utils import get_qc_with_max_round
 
 
 class BlockTree:
-    def __init__(self, validator_id, replicas, ledger, nfaulty, id_block):
+    def __init__(self, validator_id, ledger, nfaulty, id_block):
         '''
         pending block tree; // tree of blocks pending commitment
         pending votes; // collected votes per block indexed by their LedgerInfo hash
@@ -19,7 +19,6 @@ class BlockTree:
 
         self.pending_signers = dict()
 
-        self.validator = replicas[validator_id]
         self.validator_id = validator_id
         self.ledger = ledger
         self.f = nfaulty
