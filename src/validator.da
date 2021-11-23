@@ -36,19 +36,11 @@ class Validator (process):
         self.pacemaker = Pacemaker(
             validator_id, replicas, self.blocktree, self.safety, config['nfaulty'], config['delta'], send_timeout_msg)
         self.mempool = MemPool(validator_id)
-        self.leader_election = LeaderElection(
-            validator_id, replicas, self.ledger, self.pacemaker, config['window_size'], config['exclude_size'])
+        self.leader_election = LeaderElection(replicas)
 
         Cryptography.private_key = self.private_key
         Cryptography.replicas = self.replicas
         Cryptography.public_keys_validators = self.public_keys_validators
-
-        if config['failure_config'].seed is None:
-            config['failure_config'].seed = random.randint(10000, 100000)
-            LOGGER.log_action("Generated a seed for failure config",
-                              config['failure_config'].seed)
-
-        random.seed(config['failure_config'].seed)
 
     # Broadcast the timeout message
     def send_timeout_msg(timeout_msg):

@@ -4,7 +4,7 @@ from logger_util import LOGGER
 class LeaderElection:
 
     # todo init based on test case
-    def __init__(self, validator_id, replicas, ledger, pacemaker, window_size, exclude_size):
+    def __init__(self, replicas):
         """validators; // The list of current validators"""
         self.replicas = replicas
 
