@@ -4,7 +4,6 @@ import sys
 
 sys.path.append('../config')
 
-from client import Client
 from config import configs
 from cryptography import Cryptography
 from validator_twins import ValidatorTwins
@@ -15,21 +14,17 @@ class RunDiemBFT(process):
 
     def setup(config, config_id):
         self.nvalidators = int(config['nvalidators'])
-        self.nclients = int(config['nclients'])
         self.nfaulty = int(config['nfaulty'])
 
     def run():
 
         private_keys_validators = {}
         public_keys_validators = {}
-        private_keys_clients = {}
-        public_keys_clients = {}
 
         os.makedirs('../logs/config' + str(config_id))
         os.makedirs('../ledgers/config' + str(config_id))
 
         validators = new(ValidatorTwins, num=nvalidators)
-        clients = new(Client, num=nclients)
 
         network_playground = new(NetworkPlayground, num=1)
         setup(network_playground, ([],))
@@ -39,26 +34,15 @@ class RunDiemBFT(process):
             private_keys_validators[v] = private_key
             public_keys_validators[v] = public_key
 
-        for c in clients:
-            private_key, public_key = Cryptography.generate_key()
-            private_keys_clients[c] = private_key
-            public_keys_clients[c] = public_key
-
         for i, v in enumerate(validators):
-            setup({v}, (config, config_id, i, list(validators), list(clients),
-                        private_keys_validators[v], public_keys_validators, public_keys_clients, network_playground))
-
-        for i, c in enumerate(clients):
-            setup({c}, (config, config_id, i, list(validators),
-                        private_keys_clients[c], public_keys_validators))
+            setup({v}, (config, config_id, i, list(validators),
+                        private_keys_validators[v], public_keys_validators, network_playground))
 
         start(network_playground)
         start(validators)
-        start(clients)
 
-        await(each(c in clients, has=received(('Done',), from_=c)))
-        output("All clients done, informing all validators.", config_id)
-        send(('Done',), to=validators)
+        await(each(v in validators, has=received(('Done',), from_=v)))
+        output("All validators done.", config_id)
         send(('Done',), to=network_playground)
 
 

@@ -8,6 +8,7 @@ class NetworkPlayground(process):
     def run():
         # todo
         await(received(('Done',), from_=parent()))
+        output("Network playground exiting")
 
     def receive(msg=('ValidatorMessage', from_twin_validator_id, to_twin_validator_id, to_process, round_num, message_type, message), from_ = from_process):
         if can_send(from_twin_validator_id, to_twin_validator_id):

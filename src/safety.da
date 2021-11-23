@@ -158,9 +158,9 @@ class Safety:
                 self.blocktree.high_commit_qc,
                 self.validator_id
             )
-            LOGGER.log('Safety: make_vote: returns', vote_msg)
+            LOGGER.log_event('Safety: make_vote: returns', '', vote_msg, '')
             return vote_msg
-        LOGGER.log('Safety: make_vote: returns', None)
+        LOGGER.log_event('Safety: make_vote: returns', '', None, '')
         '''return ⊥'''
         return None
 
