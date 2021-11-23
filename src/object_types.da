@@ -1,32 +1,4 @@
-from collections import namedtuple
-from enum import Enum
-
 from cryptography import Cryptography
-
-
-class MsgType(Enum):
-    Proposal = 1
-    QC = 2
-    Timeout = 3
-    Vote = 4
-    Response = 5
-    Request = 6
-    Done = 7
-    Wildcard = 8   # matches all message types
-
-
-class FailType(Enum):
-    MsgLoss = 1
-    Delay = 2
-    SetAttr = 3
-
-
-Failure = namedtuple('Failure', ['src', 'dest', 'msg_type', 'round',
-                                 'prob', 'fail_type', 'val', 'attr'])
-
-FailureConfig = namedtuple(
-    'FailureConfig', ['failures', 'seed'])
-
 
 '''
 VoteInfo
@@ -199,3 +171,16 @@ class ProposalMsg:
         self.high_commit_qc = high_commit_qc  # QC to synchronize on committed blocks
         self.sender = validator
         self.signature = Cryptography.sign_message(self.block.id)
+
+
+class TestCase:
+    n_rounds: int
+    n_validators: int
+    leader_partitions: list
+    twin_ids: list
+
+    def __init__(self, n_rounds: int, n_validators: int, leader_partitions: list, twin_ids: list):
+        self.n_rounds = n_rounds
+        self.n_validators = n_validators
+        self.leader_partitions = leader_partitions
+        self.twin_ids = twin_ids

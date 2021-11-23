@@ -6,7 +6,7 @@ from leader_election import LeaderElection
 from ledger import Ledger
 from logger_util import LOGGER
 from mem_pool import MemPool
-from object_types import FailType, MsgType, ProposalMsg
+from object_types import ProposalMsg
 from pacemaker import Pacemaker
 from safety import Safety
 
