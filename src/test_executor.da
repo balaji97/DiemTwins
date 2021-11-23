@@ -1,0 +1,74 @@
+import os
+import shutil
+
+from object_types import TestCase
+
+from cryptography import Cryptography
+from validator_twins import ValidatorTwins
+from network_playground import NetworkPlayground
+
+class TestExecutor(process):
+    def setup(test_case, test_id):
+        self.n_validators = test_case.n_validators
+        self.n_faulty = (self.n_validators - 1)//3
+        self.delta = test_case.delta
+
+    def run():
+
+        private_keys_validators = {}
+        public_keys_validators = {}
+
+        os.makedirs('../logs/config' + str(test_id))
+        os.makedirs('../ledgers/config' + str(test_id))
+
+        validators = new(ValidatorTwins, num=n_validators)
+
+        network_playground = new(NetworkPlayground, num=1)
+        setup(network_playground, ([],))
+
+        for v in validators:
+            private_key, public_key = Cryptography.generate_key()
+            private_keys_validators[v] = private_key
+            public_keys_validators[v] = public_key
+
+        validator_config = {
+            "nvalidators": self.n_validators,
+            "nfaulty": self.n_faulty,
+            "delta": self.delta
+        }
+
+        for i, v in enumerate(validators):
+            setup({v}, (validator_config, test_id, i, list(validators),
+                        private_keys_validators[v], public_keys_validators, network_playground))
+
+        start(network_playground)
+        start(validators)
+
+        await(each(v in validators, has=received(('Done',), from_=v)))
+        output("All validators done.")
+        send(('Done',), to=network_playground)
+
+
+
+def main():
+
+    if os.path.exists('../logs/') and os.path.isdir('../logs/'):
+        shutil.rmtree('../logs/')
+
+    if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
+        shutil.rmtree('../ledgers/')
+
+    # todo we will later read this from a file
+    test_cases = [
+        TestCase(
+            n_rounds= 10,
+            n_validators=4,
+            leader_partitions=[],
+            twin_ids=[]
+        )
+    ]
+
+    for test_id, test_case in enumerate(test_cases):
+        p = new(TestExecutor)
+        setup(p, (test_case, test_id))
+        start(p)

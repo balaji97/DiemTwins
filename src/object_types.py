@@ -178,9 +178,11 @@ class TestCase:
     n_validators: int
     leader_partitions: list
     twin_ids: list
+    delta: int
 
-    def __init__(self, n_rounds: int, n_validators: int, leader_partitions: list, twin_ids: list):
+    def __init__(self, n_rounds: int, n_validators: int, leader_partitions: list, twin_ids: list, delta=1):
         self.n_rounds = n_rounds
         self.n_validators = n_validators
         self.leader_partitions = leader_partitions
         self.twin_ids = twin_ids
+        self.delta = delta
