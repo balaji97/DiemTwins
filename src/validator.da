@@ -34,7 +34,7 @@ class Validator (process):
         self.pacemaker = Pacemaker(
             validator_id, replicas, self.blocktree, self.safety, config['nfaulty'], config['delta'], send_timeout_msg)
         self.mempool = MemPool(validator_id)
-        self.leader_election = LeaderElection(replicas)
+        self.leader_election = LeaderElection(config['leaders'], config['default_leader'])
 
         Cryptography.private_key = self.private_key
         Cryptography.replicas = self.replicas

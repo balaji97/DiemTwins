@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from object_types import TestCase
+from object_types import TestCase, LeaderPartition
 
 from cryptography import Cryptography
 from validator_twins import ValidatorTwins
@@ -32,11 +32,18 @@ class TestExecutor(process):
             private_keys_validators[v] = private_key
             public_keys_validators[v] = public_key
 
+        for validator_id, validator in enumerate(validators):
+            if validator_id not in test_case.twin_ids:
+                default_leader = validator
+                break
+
         validator_config = {
             "nrounds": self.n_rounds,
             "nvalidators": self.n_validators,
             "nfaulty": self.n_faulty,
-            "delta": self.delta
+            "delta": self.delta,
+            "leaders": [list(validators)[leader_partition.leader] for leader_partition in test_case.leader_partitions],
+            "default_leader": default_leader
         }
 
         for i, v in enumerate(validators):
@@ -65,7 +72,18 @@ def main():
         TestCase(
             n_rounds= 10,
             n_validators=4,
-            leader_partitions=[],
+            leader_partitions=[
+                LeaderPartition(0, []),
+                LeaderPartition(0, []),
+                LeaderPartition(0, []),
+                LeaderPartition(0, []),
+                LeaderPartition(1, []),
+                LeaderPartition(1, []),
+                LeaderPartition(1, []),
+                LeaderPartition(1, []),
+                LeaderPartition(2, []),
+                LeaderPartition(3, [])
+            ],
             twin_ids=[]
         )
     ]

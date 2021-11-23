@@ -1,3 +1,5 @@
+from typing import List
+
 from cryptography import Cryptography
 
 '''
@@ -173,14 +175,23 @@ class ProposalMsg:
         self.signature = Cryptography.sign_message(self.block.id)
 
 
+class LeaderPartition:
+    leader: int
+    partitions: list
+
+    def __init__(self, leader: int, partitions: list):
+        self.leader = leader
+        self.partitions = partitions
+
+
 class TestCase:
     n_rounds: int
     n_validators: int
-    leader_partitions: list
+    leader_partitions: List[LeaderPartition]
     twin_ids: list
     delta: int
 
-    def __init__(self, n_rounds: int, n_validators: int, leader_partitions: list, twin_ids: list, delta=1):
+    def __init__(self, n_rounds: int, n_validators: int, leader_partitions: List[LeaderPartition], twin_ids: list, delta=1):
         self.n_rounds = n_rounds
         self.n_validators = n_validators
         self.leader_partitions = leader_partitions
