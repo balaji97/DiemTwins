@@ -1,4 +1,5 @@
 from validator import Validator
+from logger_util import LOGGER
 
 class ValidatorTwins(process, Validator):
     def send(payload, to):
@@ -14,6 +15,7 @@ class ValidatorTwins(process, Validator):
 
         if not should_partition(message_type, self.pacemaker.current_round):
             # Send the message to all recipients without applying filtering logic
+            LOGGER.log_action("Not applying network partition logic", (message_type, self.pacemaker.current_round))
             for to_validator in [validator_map[to_twin_id] for to_twin_id in to_validator_twin_ids]:
                 super().send(payload, to=to_validator)
         else:
@@ -32,6 +34,7 @@ class ValidatorTwins(process, Validator):
 
             if message_type in dropped_messages:
                 # Intra partition message drop
+                LOGGER.log_action("Dropping message due to intra-partition message drop", message_type)
                 return
 
             for to_validator_twin_id in to_validator_twin_ids:
@@ -39,6 +42,8 @@ class ValidatorTwins(process, Validator):
                 if to_validator_twin_id in current_partition:
                     to_validator = validator_map[to_validator_twin_id]
                     super().send(payload, to=to_validator)
+                else:
+                    LOGGER.log_action("Dropping message to validator due to network partition", to_validator_twin_id)
 
 
     def should_partition(message_type, round_num):

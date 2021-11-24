@@ -35,21 +35,22 @@ class Pacemaker:
         return 4*self.delta
 
     def stop_timer(self, round):
-        LOGGER.log('Pacemaker: stop_timer', round)
+        LOGGER.log_action('Pacemaker: stop_timer', round)
         if self.timer is not None:
             self.timer.cancel()
 
     '''Procedure start timer(new round)'''
 
     def start_timer(self, new_round):
-        LOGGER.log('Pacemaker: start_timer', new_round)
-        '''stop timer(current round)'''
+        """stop timer(current round)"""
         self.stop_timer(self.current_round)
         '''current round ← new round'''
         self.current_round = new_round
         '''start local timer for round current round for duration get round timer(current round)'''
         self.timer = threading.Timer(self.get_round_timer(
             new_round), self.local_timeout_round)
+
+        LOGGER.log_action('Pacemaker: starting timer', new_round)
         self.timer.start()
 
     '''Procedure local timeout round()'''
@@ -81,7 +82,7 @@ class Pacemaker:
         '''if tmo info.round < current round then
             return ⊥'''
         if tmo_info.round < self.current_round:
-            LOGGER.log('Pacemaker: process_remote_timeout: returns', None)
+            LOGGER.log_action('Pacemaker: ignoring timeout due to outdated round', {'current_round': self.current_round, "tmo_round": tmo_info.round})
             return None
 
         '''if tmo info.sender 6∈ pending timeouts[tmo info.round].senders then
@@ -101,7 +102,7 @@ class Pacemaker:
             stop timer(current round)
             local timeout round() // Bracha timeout'''
         if len(self.tmo_senders[tmo_info.round]) == self.f + 1:
-            # self.stop_timer(self.current_round)
+            self.stop_timer(self.current_round)
             self.local_timeout_round()  # Bracha timeout
 
         '''if |pending timeouts[tmo info.round].senders| == 2f + 1 then'''

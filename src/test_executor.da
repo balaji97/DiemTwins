@@ -78,9 +78,9 @@ def main():
             n_rounds= 10,
             n_validators=4,
             leader_partitions=[
-                LeaderPartition(0, [Partition([], ['0', '1', '2', '3'])]),
-                LeaderPartition(0, [Partition([], ['0', '1', '2', '3'])]),
-                LeaderPartition(0, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(1, [Partition([], ['0']), Partition([], ['1', '2', '3'])]),
+                LeaderPartition(1, [Partition([], ['0', '1']), Partition([], ['2', '3'])]),
+                LeaderPartition(0, [Partition([], ['0', '1', '2']), Partition([], ['3'])]),
                 LeaderPartition(1, [Partition([], ['0', '1', '2', '3'])]),
                 LeaderPartition(1, [Partition([], ['0', '1', '2', '3'])]),
                 LeaderPartition(1, [Partition([], ['0', '1', '2', '3'])]),

@@ -166,7 +166,7 @@ class Safety:
     '''Function make timeout(round, high qc, last tc)'''
     #Verify signatures and tmo_signatures in QC & TC, and Create appropriate TimeoutInfo object 
     def make_timeout(self, round, high_qc, last_tc):
-        LOGGER.log('Safety: make_timeout', round, high_qc, last_tc)
+        LOGGER.log_action('Safety: make_timeout', (round, high_qc, last_tc))
         if high_qc is None:
             qc_round = 0
         else:

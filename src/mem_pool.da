@@ -3,7 +3,8 @@ from threading import Lock
 
 class MemPool:
 
-    def __init__(self, validator_id):
+    def __init__(self, validator_id, pacemaker):
+        self.pacemaker = pacemaker
         self.lock = Lock()
         self.transaction_ctr = 0
 
@@ -13,8 +14,8 @@ class MemPool:
 
         with self.lock:
             txn = dict()
-            txn['command'] = twin_id + "_" + str(self.transaction_ctr)
-            txn['req_id'] = twin_id + "_" + str(self.transaction_ctr)
+            txn['command'] = twin_id + "_" + str(self.transaction_ctr) + "_" + str(self.pacemaker.current_round)
+            txn['req_id'] = twin_id + "_" + str(self.transaction_ctr) + "_" + str(self.pacemaker.current_round)
 
             send_txns = [txn]
             self.transaction_ctr += 1
