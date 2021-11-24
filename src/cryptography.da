@@ -62,5 +62,5 @@ class Cryptography:
             return Cryptography.valid_signature_with_signer(message.author_signature, message.author)
 
     def valid_signature_with_signer(message, signer):
-        signature = Cryptography.get_verified_message(message, Cryptography.public_keys_validators[Cryptography.replicas[signer]])
+        signature = Cryptography.get_verified_message(message, Cryptography.public_keys_validators[signer])
         return signature is not None

@@ -45,11 +45,11 @@ VoteMsg
 
 
 class VoteMsg:
-    def __init__(self, vote_info=None, ledger_commit_info=None, high_commit_qc=None, validator=None):
+    def __init__(self, vote_info=None, ledger_commit_info=None, high_commit_qc=None, validator_id=0):
         self.vote_info = vote_info  # A VoteInfo record
         self.ledger_commit_info = ledger_commit_info  # Speculated ledger info
         self.high_commit_qc = high_commit_qc  # QC to synchronize on committed blocks
-        self.sender = validator  # Added automatically when constructed
+        self.sender = validator_id  # Added automatically when constructed
         # self.signature = self.ledger_commit_info
         self.signature = Cryptography.sign_message(self.ledger_commit_info)
 
@@ -106,10 +106,10 @@ TimeoutInfo
 
 
 class TimeoutInfo:
-    def __init__(self, round=None, high_qc=None, validator=None):
+    def __init__(self, round=None, high_qc=None, validator_id=0):
         self.round = round
         self.high_qc = high_qc
-        self.author = validator  # Added automatically when constructed
+        self.author = validator_id  # Added automatically when constructed
         # Signed automatically when constructed
         # self.signature = round + self.high_qc.round
         if high_qc is None:
@@ -166,12 +166,12 @@ ProposalMsg
 
 
 class ProposalMsg:
-    def __init__(self, block=None, last_round_tc=None, high_commit_qc=None, validator=None):
+    def __init__(self, block=None, last_round_tc=None, high_commit_qc=None, validator_id=0):
         self.block = block
         # TC for block.round − 1 if block.qc.vote info.round 6= block.round − 1, else ⊥
         self.last_round_tc = last_round_tc
         self.high_commit_qc = high_commit_qc  # QC to synchronize on committed blocks
-        self.sender = validator
+        self.sender = validator_id
         self.signature = Cryptography.sign_message(self.block.id)
 
 

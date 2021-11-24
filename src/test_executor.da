@@ -15,18 +15,18 @@ class TestExecutor(process):
 
     def run():
 
-        private_keys_validators = {}
-        public_keys_validators = {}
+        private_keys_validators = []
+        public_keys_validators = []
 
         os.makedirs('../logs/config' + str(test_id))
         os.makedirs('../ledgers/config' + str(test_id))
 
         validators = new(ValidatorTwins, num=n_validators)
 
-        for v in validators:
+        for validator_id in range(test_case.n_validators):
             private_key, public_key = Cryptography.generate_key()
-            private_keys_validators[v] = private_key
-            public_keys_validators[v] = public_key
+            private_keys_validators.append(private_key)
+            public_keys_validators.append(public_key)
 
         for validator_id, _ in enumerate(validators):
             if validator_id not in test_case.twin_ids:
@@ -42,9 +42,9 @@ class TestExecutor(process):
             "default_leader": default_leader
         }
 
-        for i, v in enumerate(validators):
-            setup({v}, (validator_config, test_id, i, list(validators),
-                        private_keys_validators[v], public_keys_validators, test_case))
+        for validator_id, v in enumerate(validators):
+            setup({v}, (validator_config, test_id, validator_id, list(validators),
+                        private_keys_validators[validator_id], public_keys_validators, test_case))
 
         start(validators)
 

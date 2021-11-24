@@ -37,7 +37,6 @@ class Validator (process):
         self.leader_election = LeaderElection(config['leaders'], config['default_leader'])
 
         Cryptography.private_key = self.private_key
-        Cryptography.replicas = self.replicas
         Cryptography.public_keys_validators = self.public_keys_validators
 
     # Broadcast the timeout message
@@ -101,7 +100,7 @@ class Validator (process):
                 block=block,
                 last_round_tc=last_tc,
                 high_commit_qc=self.blocktree.high_commit_qc,
-                validator=validator_id
+                validator_id=validator_id
             )
             send(('Proposal', proposal_msg), to=self.replicas)
             LOGGER.log_event("Sent", "Proposal",
@@ -114,7 +113,7 @@ class Validator (process):
         LOGGER.log_event("Received", "Proposal", proposal_msg, p)
 
         signature_verified = Cryptography.get_verified_message(
-            proposal_msg.signature, public_keys_validators[p])
+            proposal_msg.signature, public_keys_validators[proposal_msg.sender])
 
         if signature_verified is not None:
             LOGGER.log_action("Verified ProposalMsg signature", True)
@@ -163,7 +162,7 @@ class Validator (process):
         LOGGER.log_event("Received", "Vote", vote_msg, p)
 
         signature_verified = Cryptography.get_verified_message(
-            vote_msg.signature, public_keys_validators[p])
+            vote_msg.signature, public_keys_validators[vote_msg.sender])
 
         if signature_verified is not None:
             LOGGER.log_action("Verified VoteMsg signature", True)
@@ -187,7 +186,7 @@ class Validator (process):
         LOGGER.log_event("Received", "Timeout", timeout_msg, p)
 
         signature_verified = Cryptography.get_verified_message(
-            timeout_msg.tmo_info.author_signature, public_keys_validators[p])
+            timeout_msg.tmo_info.author_signature, public_keys_validators[timeout_msg.tmo_info.author])
 
         if signature_verified is not None:
             LOGGER.log_action("Verified TimeoutMsg signature", True)
