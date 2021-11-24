@@ -34,6 +34,7 @@ class TestExecutor(process):
                 break
 
         validator_config = {
+            "config_id": test_id,
             "nrounds": self.n_rounds,
             "nvalidators": self.n_validators,
             "nfaulty": self.n_faulty,
@@ -51,8 +52,10 @@ class TestExecutor(process):
             validator_map[str(validator_id)] = validator
 
         for validator_id, v in enumerate(validators):
-            setup({v}, (validator_config, test_id, validator_id, list(validators),
-                        private_keys_validators[validator_id], public_keys_validators, test_case, validator_map))
+            # todo handle twins
+            twin_id = str(validator_id)
+            setup({v}, (validator_config, validator_id,
+                        private_keys_validators[validator_id], public_keys_validators, twin_id, test_case, validator_map))
 
         start(validators)
 

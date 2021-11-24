@@ -13,21 +13,39 @@ class ValidatorTwins(process, Validator):
                 to_validator_twin_ids += [str(to_validator_id)]
 
         if not should_partition(message_type, self.pacemaker.current_round):
+            # Send the message to all recipients without applying filtering logic
             for to_validator in [validator_map[to_twin_id] for to_twin_id in to_validator_twin_ids]:
                 super().send(payload, to=to_validator)
+        else:
+            # Only send to the twin_ids part of the current partition
+            leader_partition_scenario = test_case.leader_partitions[pacemaker.current_round - 1]
+            current_partition = []
 
-            return
+            for partition in leader_partition_scenario.partitions:
+                network_partition = partition.partitions
+
+                if twin_id in network_partition:
+                    current_partition = network_partition
+                    break
+
+            for to_validator_twin_id in to_validator_twin_ids:
+                if to_validator_twin_id in current_partition:
+                    to_validator = validator_map[to_validator_twin_id]
+                    super().send(payload, to=to_validator)
+
 
 
     def should_partition(message_type, round_num):
-        return False
 
-        # todo
         if round_num > test_case.n_rounds or message_type not in {'Proposal', 'Vote', 'Timeout'}:
             return False
 
         if message_type in {'Proposal', 'Vote'}:
             return True
         else:
-            # todo
-            return False
+            # Else, message type is Timeout
+            # If we have not sent a timeout message for this round, return True, else False
+            ans = round_num not in self.timed_out_rounds
+            self.timed_out_rounds.add(round_num)
+
+            return ans

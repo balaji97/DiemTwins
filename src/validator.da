@@ -11,9 +11,11 @@ from safety import Safety
 
 class Validator (process):
 
-    def setup(config, config_id: int, validator_id: int, replicas: list, private_key, public_keys_validators, test_case, validator_map):
+    def setup(config, validator_id: int, private_key, public_keys_validators, twin_id, test_case, validator_map):
+        config_id = config['config_id']
+        self.timed_out_rounds = set()
 
-        LOGGER.process_id = "validator_" + str(validator_id)
+        LOGGER.process_id = "validator_" + twin_id
         LOGGER.filename = '../logs/config' + str(config_id) + '/' \
             + LOGGER.process_id + ".log"
 
@@ -117,7 +119,7 @@ class Validator (process):
         if signature_verified is not None:
             LOGGER.log_action("Verified ProposalMsg signature", True)
 
-            if proposal_msg.block.qc is not None and p != replicas[validator_id]:
+            if proposal_msg.block.qc is not None and self.validator_id != proposal_msg.sender:
                 '''process certificate qc(P.block.qc)'''
                 process_certificate_qc(proposal_msg.block.qc)
 
@@ -131,11 +133,11 @@ class Validator (process):
             '''round ← Pacemaker.current round'''
             round = self.pacemaker.current_round
             '''leader ← LeaderElection.get leader(current round)'''
-            leader = self.replicas[self.leader_election.get_leader(round)]
+            leader = self.leader_election.get_leader(round)
             '''if P.block.round 6= round ∨ P.sender 6= leader ∨ P.block.author 6= leader then
                     return'''
-            if proposal_msg.block.round != round or replicas[proposal_msg.sender] != leader or replicas[proposal_msg.block.author] != leader:
-                LOGGER.log("ROUND PROPOSAL EARLY EXIT", proposal_msg.block.round, round, replicas[proposal_msg.sender], leader)
+            if proposal_msg.block.round != round or proposal_msg.sender != leader or proposal_msg.block.author != leader:
+                LOGGER.log("ROUND PROPOSAL EARLY EXIT", proposal_msg.block.round, round, proposal_msg.sender, leader)
                 return
 
             '''Block-Tree.execute and insert(P) // Adds a new speculative state to the Ledger'''
