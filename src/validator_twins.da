@@ -20,19 +20,25 @@ class ValidatorTwins(process, Validator):
             # Only send to the twin_ids part of the current partition
             leader_partition_scenario = test_case.leader_partitions[pacemaker.current_round - 1]
             current_partition = []
+            dropped_messages = []
 
             for partition in leader_partition_scenario.partitions:
                 network_partition = partition.partitions
 
                 if twin_id in network_partition:
                     current_partition = network_partition
+                    dropped_messages = partition.dropped_messages
                     break
 
+            if message_type in dropped_messages:
+                # Intra partition message drop
+                return
+
             for to_validator_twin_id in to_validator_twin_ids:
+                # Send to all recipients who are in the same partition
                 if to_validator_twin_id in current_partition:
                     to_validator = validator_map[to_validator_twin_id]
                     super().send(payload, to=to_validator)
-
 
 
     def should_partition(message_type, round_num):
