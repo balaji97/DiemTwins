@@ -6,8 +6,6 @@ from utils import todict
 class LOGGER:
 
     process_id = ""
-    replicas = []
-    clients = []
     filename = ""
 
     def log_event(event, msg_type, msg, proc=None):
@@ -15,12 +13,8 @@ class LOGGER:
             pass
         elif type(proc) == set or type(proc) == list:
             other_proc = "ALL validators"
-        elif proc in LOGGER.replicas:
-            other_proc = "validator_" + str(LOGGER.replicas.index(proc))
-        elif proc in LOGGER.clients:
-            other_proc = "client_" + str(LOGGER.clients.index(proc))
         else:
-            other_proc = "parent_process"
+            other_proc = "validator_" + str(proc)
 
         if msg != None and hasattr(msg, '__dict__'):
             msg = todict(msg)

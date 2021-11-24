@@ -13,13 +13,13 @@ class Validator (process):
 
     def setup(config, config_id: int, validator_id: int, replicas: list, private_key, public_keys_validators, test_case):
 
-        LOGGER.replicas = replicas
         LOGGER.process_id = "validator_" + str(validator_id)
-        LOGGER.clients = []
         LOGGER.filename = '../logs/config' + str(config_id) + '/' \
             + LOGGER.process_id + ".log"
 
         LOGGER.log_action("Initial configuration", config)
+
+        self.validator_ids = [i for i in range(config['nvalidators'])]
 
         self.id_block = dict()
         self.request_cache = dict()
@@ -43,12 +43,11 @@ class Validator (process):
     def send_timeout_msg(timeout_msg):
         LOGGER.log('Validator: send_timeout_message', timeout_msg)
         send(('Timeout', timeout_msg), to=self.replicas)
-        LOGGER.log_event('Sent', 'Timeout', timeout_msg, self.replicas)
+        LOGGER.log_event('Sent', 'Timeout', timeout_msg, self.validator_ids)
 
     '''Procedure start event processing(M)'''
     def run():
         self.pacemaker.start_timer(1)
-        LOGGER.log(replicas[validator_id])
 
         self.process_new_round_event(None)
 
@@ -58,7 +57,7 @@ class Validator (process):
         self.pacemaker.stop_timer(self.pacemaker.current_round)
         output("Validator", self.validator_id, "is exiting")
 
-        send(('Done',), to=parent())
+        super().send(('Done',), to=parent())
 
     '''Procedure process certificate qc(qc)'''
     def process_certificate_qc(qc):
@@ -104,7 +103,7 @@ class Validator (process):
             )
             send(('Proposal', proposal_msg), to=self.replicas)
             LOGGER.log_event("Sent", "Proposal",
-                             proposal_msg, self.replicas)
+                             proposal_msg, self.validator_ids)
 
         LOGGER.log("Validator: process_new_round_event ends", None)
 
