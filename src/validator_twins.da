@@ -2,13 +2,21 @@ from validator import Validator
 
 class ValidatorTwins(process, Validator):
     def send(payload, to):
-        message_type = payload[0]
-
-        if not should_partition(message_type, self.pacemaker.current_round):
-            super().send(payload, to=to)
-            return
+        to_validator_ids = to
 
         message_type, message = payload
+        to_validator_twin_ids = []
+        for to_validator_id in to_validator_ids:
+            if to_validator_id in test_case.twin_ids:
+                to_validator_twin_ids += [str(to_validator_id), str(to_validator_id + "_twin")]
+            else:
+                to_validator_twin_ids += [str(to_validator_id)]
+
+        if not should_partition(message_type, self.pacemaker.current_round):
+            for to_validator in [validator_map[to_twin_id] for to_twin_id in to_validator_twin_ids]:
+                super().send(payload, to=to_validator)
+
+            return
 
 
     def should_partition(message_type, round_num):

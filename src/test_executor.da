@@ -42,9 +42,17 @@ class TestExecutor(process):
             "default_leader": default_leader
         }
 
+        validator_map = dict()
+        for validator_id, validator in enumerate(validators):
+            if validator_id in test_case.twin_ids:
+                # todo spawn twin here and add to validator map
+                pass
+
+            validator_map[str(validator_id)] = validator
+
         for validator_id, v in enumerate(validators):
             setup({v}, (validator_config, test_id, validator_id, list(validators),
-                        private_keys_validators[validator_id], public_keys_validators, test_case))
+                        private_keys_validators[validator_id], public_keys_validators, test_case, validator_map))
 
         start(validators)
 
@@ -67,16 +75,16 @@ def main():
             n_rounds= 10,
             n_validators=4,
             leader_partitions=[
-                LeaderPartition(0, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
-                LeaderPartition(0, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
-                LeaderPartition(0, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
-                LeaderPartition(1, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
-                LeaderPartition(1, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
-                LeaderPartition(1, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
-                LeaderPartition(2, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
-                LeaderPartition(2, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
-                LeaderPartition(3, [Partition([], [(0, False), (1, False), (2, False), (3, False)])]),
-                LeaderPartition(3, [Partition([], [(0, False), (1, False), (2, False), (3, False)])])
+                LeaderPartition(0, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(0, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(0, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(1, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(1, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(1, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(2, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(2, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(3, [Partition([], ['0', '1', '2', '3'])]),
+                LeaderPartition(3, [Partition([], ['0', '1', '2', '3'])])
             ],
             twin_ids=[]
         )

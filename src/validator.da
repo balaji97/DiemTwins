@@ -11,7 +11,7 @@ from safety import Safety
 
 class Validator (process):
 
-    def setup(config, config_id: int, validator_id: int, replicas: list, private_key, public_keys_validators, test_case):
+    def setup(config, config_id: int, validator_id: int, replicas: list, private_key, public_keys_validators, test_case, validator_map):
 
         LOGGER.process_id = "validator_" + str(validator_id)
         LOGGER.filename = '../logs/config' + str(config_id) + '/' \
@@ -42,7 +42,7 @@ class Validator (process):
     # Broadcast the timeout message
     def send_timeout_msg(timeout_msg):
         LOGGER.log('Validator: send_timeout_message', timeout_msg)
-        send(('Timeout', timeout_msg), to=self.replicas)
+        send(('Timeout', timeout_msg), to=self.validator_ids)
         LOGGER.log_event('Sent', 'Timeout', timeout_msg, self.validator_ids)
 
     '''Procedure start event processing(M)'''
@@ -101,7 +101,7 @@ class Validator (process):
                 high_commit_qc=self.blocktree.high_commit_qc,
                 validator_id=validator_id
             )
-            send(('Proposal', proposal_msg), to=self.replicas)
+            send(('Proposal', proposal_msg), to=self.validator_ids)
             LOGGER.log_event("Sent", "Proposal",
                              proposal_msg, self.validator_ids)
 
@@ -148,10 +148,10 @@ class Validator (process):
             '''if vote msg != ⊥ then
                     send vote msg to LeaderElection.get leader(current round + 1)'''
             if vote_msg is not None:
-                next_leader = self.replicas[self.leader_election.get_leader(round + 1)]
+                next_leader_id = self.leader_election.get_leader(round + 1)
                 send(('Vote', vote_msg),
-                     to=next_leader)
-                LOGGER.log_event("Sent", "Vote", vote_msg, next_leader)
+                     to=[next_leader_id])
+                LOGGER.log_event("Sent", "Vote", vote_msg, next_leader_id)
 
         else:
             LOGGER.log_action("Verified ProposalMsg signature", False)
