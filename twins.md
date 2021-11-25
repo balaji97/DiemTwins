@@ -570,3 +570,10 @@ Prashant Srivastava, SBID 113166491: Network Playground, liveness check
 * Make explicit that we are no longer spawning clients.
 * Test generator takes the test config from the user and generates all possible testcases and saves it to a file. Test executor then loads all testcases from a file sequentially and executes them. - done
 * Include liveness check for no blocks dropped in between. Need all validators to dump pending block tree to file along with ledger - todo
+
+## Pending changes to DiemBFT
+
+* Change ledger and pending-block-tree to generate the chained commits
+* Change mem-pool to propose uncommitted transactions
+* Sync-up outdated replicas
+* 

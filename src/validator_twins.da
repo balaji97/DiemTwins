@@ -9,7 +9,7 @@ class ValidatorTwins(process, Validator):
         to_validator_twin_ids = []
         for to_validator_id in to_validator_ids:
             if to_validator_id in test_case.twin_ids:
-                to_validator_twin_ids += [str(to_validator_id), str(to_validator_id + "_twin")]
+                to_validator_twin_ids += [str(to_validator_id), str(to_validator_id) + "_twin"]
             else:
                 to_validator_twin_ids += [str(to_validator_id)]
 

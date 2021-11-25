@@ -21,14 +21,12 @@ class TestExecutor(process):
         os.makedirs('../logs/config' + str(test_id))
         os.makedirs('../ledgers/config' + str(test_id))
 
-        validators = new(ValidatorTwins, num=n_validators)
-
-        for validator_id in range(test_case.n_validators):
+        for validator_id in range(self.n_validators):
             private_key, public_key = Cryptography.generate_key()
             private_keys_validators.append(private_key)
             public_keys_validators.append(public_key)
 
-        for validator_id, _ in enumerate(validators):
+        for validator_id in range(self.n_validators):
             if validator_id not in test_case.twin_ids:
                 default_leader = validator_id
                 break
@@ -44,22 +42,31 @@ class TestExecutor(process):
         }
 
         validator_map = dict()
-        for validator_id, validator in enumerate(validators):
-            if validator_id in test_case.twin_ids:
-                # todo spawn twin here and add to validator map
-                pass
 
-            validator_map[str(validator_id)] = validator
-
-        for validator_id, v in enumerate(validators):
-            # todo handle twins
+        for validator_id in range(self.n_validators):
+            # Create a validator and add to validator_map. If its not a twin, its twin_id is simply the validator_id
+            validator = new(ValidatorTwins, num=1)
             twin_id = str(validator_id)
-            setup({v}, (validator_config, validator_id,
-                        private_keys_validators[validator_id], public_keys_validators, twin_id, test_case, validator_map))
+            validator_map[twin_id] = validator
 
-        start(validators)
+            if validator_id in test_case.twin_ids:
+                # Create the twin validator process and also add it to the validator map
+                validator = new(ValidatorTwins, num=1)
+                twin_id = str(validator_id) + "_twin"
+                validator_map[twin_id] = validator
 
-        await(each(v in validators, has=received(('Done',), from_=v)))
+        all_validators = set()
+        for twin_id, validator in validator_map.items():
+            validator_id = int(twin_id[0])
+            setup(
+                validator,
+                (validator_config, validator_id, private_keys_validators[validator_id],
+                 public_keys_validators, twin_id, test_case, validator_map))
+            all_validators = all_validators.union(validator)
+
+        start(all_validators)
+
+        await(each(v in all_validators, has=received(('Done',), from_=v)))
         output("All validators done.")
 
 
@@ -78,18 +85,18 @@ def main():
             n_rounds= 10,
             n_validators=4,
             leader_partitions=[
-                LeaderPartition(1, [Partition([], ['0']), Partition([], ['1', '2', '3'])]),
-                LeaderPartition(1, [Partition([], ['0', '1']), Partition([], ['2', '3'])]),
-                LeaderPartition(0, [Partition([], ['0', '1', '2']), Partition([], ['3'])]),
-                LeaderPartition(1, [Partition([], ['0', '1', '2', '3'])]),
-                LeaderPartition(1, [Partition([], ['0', '1', '2', '3'])]),
-                LeaderPartition(1, [Partition([], ['0', '1', '2', '3'])]),
-                LeaderPartition(2, [Partition([], ['0', '1', '2', '3'])]),
-                LeaderPartition(2, [Partition([], ['0', '1', '2', '3'])]),
-                LeaderPartition(3, [Partition([], ['0', '1', '2', '3'])]),
-                LeaderPartition(3, [Partition([], ['0', '1', '2', '3'])])
+                LeaderPartition(1, [Partition([], ['0', '0_twin']), Partition([], ['1', '2', '3'])]),
+                LeaderPartition(1, [Partition([], ['0', '0_twin']), Partition([], ['1', '2', '3'])]),
+                LeaderPartition(2, [Partition([], ['0', '0_twin', '1', '2']), Partition([], ['3'])]),
+                LeaderPartition(1, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
+                LeaderPartition(1, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
+                LeaderPartition(1, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
+                LeaderPartition(2, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
+                LeaderPartition(2, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
+                LeaderPartition(3, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
+                LeaderPartition(3, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
             ],
-            twin_ids=[]
+            twin_ids=[0]
         )
     ]
 
