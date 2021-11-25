@@ -2,7 +2,7 @@ import random
 
 # Generates a TestCase for an input test_config from the user
 from twins_pseudocode.models import TestCase, LeaderPartition, TestConfig
-
+from twins_pseudocode import generate_partitions
 
 def generate_test_case(test_config: TestConfig):
     # Applies seed if present
@@ -18,7 +18,7 @@ def generate_test_case(test_config: TestConfig):
         validator_twin_ids.append(str(twin_id) + "_twin")
 
     # Generate all possible partition scenarios as described in Step 1 of 4.2 in the Twins paper
-    partition_scenarios = generate_partition_scenarios(validator_twin_ids, test_config.n_partitions)
+    partition_scenarios = generate_partition_scenarios(validator_twin_ids, 2, test_config.n_partitions)
     # For each partition scenario, enumerate all possible intra-partition message drop scenarios
     partition_scenarios = enumerate_partition_scenarios_with_drops(
         partition_scenarios, test_config.n_intra_drop_types)
@@ -73,8 +73,11 @@ def generate_leader_partitions(partition_scenarios, n_validators):
 # solving the Stirling Number of Second Kind problem.
 # A piece of code to achieve the same can be found at
 # https://stackoverflow.com/questions/45829748/python-finding-random-k-subset-partition-for-a-given-list
-def generate_partition_scenarios(validator_twin_ids, max_partitions):
-    return []
+# validator_ids: All the validator ids.
+# partition_size: size of each partition
+# max_partitions: maximum number of partitions
+def generate_partition_scenarios(validator_ids, partition_size, max_partitions):
+    return generate_partitions.getAllPossiblePartitions(validator_ids, partition_size, max_partitions)
 
 
 # Returns a list of partitions after considering every partition to have up to n_message_drop_types
