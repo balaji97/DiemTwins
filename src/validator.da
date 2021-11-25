@@ -28,7 +28,7 @@ class Validator (process):
         self.recently_committed_block_ids = list()
 
         self.ledger = Ledger(
-            config_id, validator_id, self.id_block, self.recently_committed_block_ids, self.request_cache)
+            config_id, twin_id, self.id_block, self.recently_committed_block_ids, self.request_cache)
         self.blocktree = BlockTree(
             validator_id, self.ledger, config['nfaulty'], self.id_block)
         self.safety = Safety(validator_id,
