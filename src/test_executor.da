@@ -1,7 +1,8 @@
 import os
 import shutil
+from filecmp import cmp
 
-from object_types import TestCase, LeaderPartition, Partition
+from object_types import TestCase, LeaderPartition, Partition, TestReport
 
 from cryptography import Cryptography
 from validator_twins import ValidatorTwins
@@ -69,6 +70,41 @@ class TestExecutor(process):
         await(each(v in all_validators, has=received(('Done',), from_=v)))
         output("All validators done.")
 
+        twin_ids = [twin_id for twin_id in validator_map]
+
+        # todo write to file? only write failed testcases?
+        output("Test report: ")
+        output(TestReport(self.test_id, check_safety(twin_ids), check_liveness(twin_ids)))
+
+    # todo should we check all lines or mismatching lines?
+    def check_safety(twin_ids):
+        ledger_directory = '../ledgers/config' + str(self.test_id) + '/'
+
+        for twin_id_a in twin_ids:
+            for twin_id_b in twin_ids:
+                ledger_a = ledger_directory + 'validator_' + twin_id_a + '.ledger'
+                ledger_b = ledger_directory + 'validator_' + twin_id_b + '.ledger'
+
+                if not cmp(ledger_a, ledger_b):
+                    return False
+
+        return True
+
+    def check_liveness(twin_ids):
+        ledger_directory = '../ledgers/config' + str(self.test_id) + '/'
+
+        for twin_id in twin_ids:
+            ledger = ledger_directory + 'validator_' + twin_id + '.ledger'
+            last_ledger_line = ""
+
+            with open(ledger, 'r') as f:
+                for line in f.readlines():
+                    last_ledger_line = line
+
+            if last_ledger_line != 'no-op\n':
+                return False
+
+        return True
 
 
 def main():
@@ -87,10 +123,10 @@ def main():
             leader_partitions=[
                 LeaderPartition(1, [Partition([], ['0', '0_twin']), Partition([], ['1', '2', '3'])]),
                 LeaderPartition(1, [Partition([], ['0', '0_twin']), Partition([], ['1', '2', '3'])]),
-                LeaderPartition(2, [Partition([], ['0', '0_twin', '1', '2']), Partition([], ['3'])]),
+                LeaderPartition(0, [Partition([], ['0', '0_twin', '1', '2']), Partition([], ['3'])]),
+                LeaderPartition(0, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
                 LeaderPartition(1, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
-                LeaderPartition(1, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
-                LeaderPartition(1, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
+                LeaderPartition(0, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
                 LeaderPartition(2, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
                 LeaderPartition(2, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
                 LeaderPartition(3, [Partition([], ['0', '0_twin', '1', '2', '3'])]),

@@ -205,3 +205,21 @@ class TestCase:
         self.leader_partitions = leader_partitions
         self.twin_ids = twin_ids
         self.delta = delta
+
+
+class TestReport:
+    test_id: int
+    safety_check: bool
+    liveness_check: bool
+
+    def __init__(self, test_id, safety_check, liveness_check):
+        self.test_id = test_id
+        self.safety_check = safety_check
+        self.liveness_check = liveness_check
+
+    def __str__(self):
+        return  "{ " + ", ".join([
+            "test_id: " + str(self.test_id),
+            "safety_check: " + str(self.safety_check),
+            "liveness_check: " + str(self.liveness_check)
+        ]) + " }"
