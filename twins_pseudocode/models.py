@@ -34,7 +34,7 @@ class Partition:
 
 class LeaderPartition:
     # Leader for that round
-    leader: int
+    leader: str
     # List of network partitions for this LeaderPartition scenario
     partitions: List[Partition]
 
