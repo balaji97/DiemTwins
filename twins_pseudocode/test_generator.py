@@ -20,10 +20,10 @@ def generate_test_case(test_config: TestConfig):
     # Generate all possible partition scenarios as described in Step 1 of 4.2 in the Twins paper
     partition_scenarios = generate_partition_scenarios(validator_twin_ids, 2, test_config.n_partitions)
     # For each partition scenario, enumerate all possible intra-partition message drop scenarios
-    partition_scenarios = enumerate_partition_scenarios_with_drops(
-        partition_scenarios, test_config.n_intra_drop_types)
+    # partition_scenarios = enumerate_partition_scenarios_with_drops(
+    #     partition_scenarios, test_config.n_intra_drop_types)
     # Generates all possible leader partitions as described in Step 2 of 4.2 in the Twins paper
-    all_leader_partitions = generate_leader_partitions(partition_scenarios, test_config.n_validators)
+    all_leader_partitions = generate_leader_partitions(partition_scenarios, validator_twin_ids)
 
 
     # Generates leader_partition_permutations deterministically or randomly based on config
@@ -56,10 +56,10 @@ def randomly_generate_test_cases(leader_partitions, n_rounds, n_testcases):
     return [[random.choice(leader_partitions) for _ in range(n_rounds)] for _ in range(n_testcases)]
 
 
-def generate_leader_partitions(partition_scenarios, n_validators):
+def generate_leader_partitions(partition_scenarios, all_validator_ids):
     leader_partitions = []
     for partition_scenario in partition_scenarios:
-        for leader in range(1, n_validators + 1):
+        for leader in all_validator_ids:
             # For every partition scenario, enumerate with all possible leaders
             leader_partition = LeaderPartition()
             leader_partition.leader = leader
@@ -83,7 +83,6 @@ def generate_partition_scenarios(validator_ids, partition_size, max_partitions):
 # Returns a list of partitions after considering every partition to have up to n_message_drop_types
 # dropped intra-partition
 def enumerate_partition_scenarios_with_drops(partition_scenarios, n_message_drop_types):
-    # todo
     return []
 
 
