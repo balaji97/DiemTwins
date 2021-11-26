@@ -24,7 +24,9 @@ def generate_test_case(test_config: TestConfig):
     #     partition_scenarios, test_config.n_intra_drop_types)
     # Generates all possible leader partitions as described in Step 2 of 4.2 in the Twins paper
     all_leader_partitions = generate_leader_partitions(partition_scenarios, validator_twin_ids)
-
+    # Combine the input parition-leader scenarios with rounds as described in Step 3 of 4.2 in the Twins paper
+    all_leader_partitions_roundwise = generate_leader_partitions_with_rounds(all_leader_partitions,
+                                                                             test_config.n_rounds)
 
     # Generates leader_partition_permutations deterministically or randomly based on config
     if test_config.is_deterministic:
@@ -68,6 +70,8 @@ def generate_leader_partitions(partition_scenarios, all_validator_ids):
 
     return leader_partitions
 
+def generate_leader_partitions_with_rounds(all_leader_partitions, n_rounds):
+    return []
 
 # Returns a list of all possible partition pairs using a process similar to
 # solving the Stirling Number of Second Kind problem.
