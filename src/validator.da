@@ -35,7 +35,7 @@ class Validator (process):
                              self.ledger, self.blocktree)
         self.pacemaker = Pacemaker(
             validator_id, self.blocktree, self.safety, config['nfaulty'], config['delta'], send_timeout_msg)
-        self.mempool = MemPool(validator_id, pacemaker)
+        self.mempool = MemPool(twin_id, pacemaker, test_case.n_rounds)
         self.leader_election = LeaderElection(config['leaders'], config['default_leader'])
 
         Cryptography.private_key = self.private_key
@@ -96,7 +96,7 @@ class Validator (process):
             '''b ← Block-Tree.generate block( MemPool.get transactions(),
                     Pacemaker.current round )'''
             block = self.blocktree.generate_block(
-                self.mempool.get_transactions(str(self.validator_id)), self.pacemaker.current_round)
+                self.mempool.get_transactions(), self.pacemaker.current_round)
             LOGGER.log_action('Created a new block', block)
 
             '''broadcast ProposalMsghb, last tc, Block-Tree.high commit qci'''
@@ -112,6 +112,8 @@ class Validator (process):
 
         LOGGER.log("Validator: process_new_round_event ends", None)
 
+    # Takes in as input a block and qc that we need to add to our block-tree as part of sync up
+    # First makes sure we have received all previous blocks, then adds the received block to blocktree
     def sync_up_block(to_process, block):
         self.block_cache[block.id] = block
 
@@ -121,10 +123,20 @@ class Validator (process):
             parent_block_id = None
 
         if parent_block_id is not None and parent_block_id not in self.block_cache:
-            super().send(('SyncUpRequest', parent_block_id), to=to_process)
-            --SyncUpResponse
-            await(parent_block_id in self.block_cache)
-            self.blocktree.execute_and_insert(self.block_cache[parent_block_id])
+            do_sync_up(to_process, parent_block_id)
+
+        if block.qc is not None:
+            process_certificate_qc(block.qc)
+
+        self.blocktree.execute_and_insert(block)
+
+    # Takes as input a block_id that we did not receive, and need to sync up to
+    # Requests the parent process to send the missing blocks and complete sync up
+    def do_sync_up(to_process, block_id):
+        super().send(('SyncUpRequest', block_id), to=to_process)
+        --SyncUpResponse
+        await(block_id in self.block_cache)
+
 
     '''Procedure process proposal msg(P)'''
     def receive(msg=('Proposal', proposal_msg), from_=p):
@@ -136,7 +148,15 @@ class Validator (process):
         if signature_verified is not None:
             LOGGER.log_action("Verified ProposalMsg signature", True)
 
-            sync_up_block(p, proposal_msg.block)
+            parent_block_id = None
+            if proposal_msg.block.qc is not None:
+                parent_block_id = proposal_msg.block.qc.vote_info.id
+
+            # If we have not yet received the parent block. We need to sync up to that block id
+            if parent_block_id is not None and parent_block_id not in self.block_cache:
+                do_sync_up(p, parent_block_id)
+
+            self.block_cache[proposal_msg.block.id] = proposal_msg.block
 
             if proposal_msg.block.qc is not None and self.validator_id != proposal_msg.sender:
                 '''process certificate qc(P.block.qc)'''
@@ -187,6 +207,10 @@ class Validator (process):
         if signature_verified is not None:
             LOGGER.log_action("Verified VoteMsg signature", True)
 
+            # If we have not yet received the block being voted on, need to sync up
+            if vote_msg.vote_info.id not in self.block_cache:
+                do_sync_up(p, vote_msg.vote_info.id)
+
             '''qc ← Block-Tree.process vote(M)'''
             qc = self.blocktree.process_vote(vote_msg)
             '''if qc != ⊥ then'''
@@ -210,6 +234,13 @@ class Validator (process):
 
         if signature_verified is not None:
             LOGGER.log_action("Verified TimeoutMsg signature", True)
+
+            last_block_id = None
+            if timeout_msg.tmo_info.high_qc is not None:
+                last_block_id = timeout_msg.tmo_info.high_qc.vote_info.id
+
+            if last_block_id is not None and last_block_id not in self.block_cache:
+                do_sync_up(p, last_block_id)
 
             '''process certificate qc(M.tmo info.high qc)
             process certificate qc(M.high commit qc)'''

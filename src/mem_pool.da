@@ -1,24 +1,30 @@
 from logger_util import LOGGER
-from threading import Lock
 
 class MemPool:
 
-    def __init__(self, validator_id, pacemaker):
+    def __init__(self, twin_id, pacemaker, n_rounds):
+        self.twin_id = twin_id
         self.pacemaker = pacemaker
-        self.lock = Lock()
-        self.transaction_ctr = 0
+        self.n_rounds = n_rounds
 
     # todo re-transmit in case pruned from block-tree
-    def get_transactions(self, twin_id):
+    def get_transactions(self):
         LOGGER.log('MemPool: get_transactions', None)
 
-        with self.lock:
-            txn = dict()
-            txn['command'] = twin_id + "_" + str(self.transaction_ctr) + "_" + str(self.pacemaker.current_round)
-            txn['req_id'] = twin_id + "_" + str(self.transaction_ctr) + "_" + str(self.pacemaker.current_round)
+        txn = dict()
 
-            send_txns = [txn]
-            self.transaction_ctr += 1
+        if self.pacemaker.current_round <= self.n_rounds:
+            # Send a unique transaction for each proposal. To ensure uniqueness in each round, it is twin_id_round
+            command = self.twin_id + "_" + str(self.pacemaker.current_round)
+        elif self.pacemaker.current_round == self.n_rounds + 1:
+            # In round n_rounds + 1, send a no-op that will be committed for our liveness check
+            command = 'no-op'
+        else:
+            # Round is after n_rounds + 1. Send empty txns to commit the no-op block.
+            return []
 
-        LOGGER.log('MemPool: get_transactions: returns', send_txns)
-        return send_txns
+        txn['command'] = command
+        txn['req_id'] = command
+
+        LOGGER.log('MemPool: get_transactions: returns', [txn])
+        return [txn]
