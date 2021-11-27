@@ -197,7 +197,7 @@ class TestCase:
     n_validators: int
     leader_partitions: List[LeaderPartition]
     twin_ids: list
-    delta: int
+    delta: float
 
     def __init__(self, n_rounds: int, n_validators: int, leader_partitions: List[LeaderPartition], twin_ids: list, delta=1):
         self.n_rounds = n_rounds
@@ -211,15 +211,18 @@ class TestReport:
     test_id: int
     safety_check: bool
     liveness_check: bool
+    elapsed_time: int
 
-    def __init__(self, test_id, safety_check, liveness_check):
+    def __init__(self, test_id, safety_check, liveness_check, elapsed_time):
         self.test_id = test_id
         self.safety_check = safety_check
         self.liveness_check = liveness_check
+        self.elapsed_time = elapsed_time
 
     def __str__(self):
         return  "{ " + ", ".join([
             "test_id: " + str(self.test_id),
             "safety_check: " + str(self.safety_check),
-            "liveness_check: " + str(self.liveness_check)
+            "liveness_check: " + str(self.liveness_check),
+            "elapsed_time: " + str(self.elapsed_time)
         ]) + " }"

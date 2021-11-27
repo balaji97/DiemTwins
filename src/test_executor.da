@@ -1,6 +1,7 @@
 import os
 import shutil
 from filecmp import cmp
+import time
 
 from object_types import TestCase, LeaderPartition, Partition, TestReport
 
@@ -15,6 +16,7 @@ class TestExecutor(process):
         self.delta = test_case.delta
 
     def run():
+        start_time = time.time()
 
         private_keys_validators = []
         public_keys_validators = []
@@ -74,7 +76,7 @@ class TestExecutor(process):
 
         # todo write to file? only write failed testcases?
         output("Test report: ")
-        output(TestReport(self.test_id, check_safety(twin_ids), check_liveness(twin_ids)))
+        output(TestReport(self.test_id, check_safety(twin_ids), check_liveness(twin_ids), time.time() - start_time))
 
     # todo should we check all lines or mismatching lines?
     def check_safety(twin_ids):
@@ -132,7 +134,8 @@ def main():
                 LeaderPartition(3, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
                 LeaderPartition(3, [Partition([], ['0', '0_twin', '1', '2', '3'])]),
             ],
-            twin_ids=[0]
+            twin_ids=[0],
+            delta=0.1
         )
     ]
 
