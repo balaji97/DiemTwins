@@ -11,7 +11,7 @@ class TestConfig:
     # Number of validators that will have a twin
     n_twins: int
     # Maximum number of network partitions that will be created
-    n_partitions: int
+    enum_limit: int
     # Maximum number of message types that can be dropped intra-partition
     n_intra_drop_types: int
     # Whether to generate test cases deterministically or not
@@ -22,7 +22,8 @@ class TestConfig:
     seed: int
     # Path at which we store the generated test cases
     path: str
-
+    num_non_empty_partition : int
+    leader_type : str
 
 class Partition:
     # Types of messages from {ProposalMessage, VoteMessage, TimeoutMessage} that will be dropped

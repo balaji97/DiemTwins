@@ -1,34 +1,37 @@
-def isValid(ps):
-    cand_dis_set = set()
-    cand_partition_len = 0
-    for partition in ps:
 
-        dis_set = set()
-        partition_len = len(partition)
+# Checks if in the given partition scenario eventually quorum exists or not for ensuring liveness property.
+# def isValidPartition(partition):
+#     distinct_validator_set = set()
+#     possible_partition_len = 0
+#
+#     for each_partition in partition:
+#         each_partition_distinct_validators_set = set()
+#         partition_len = len(each_partition_distinct_validators_set)
+#
+#         for validator_id in each_partition:
+#             each_partition_distinct_validators_set.add(validator_id.split("_")[0])
+#
+#             if len(each_partition_distinct_validators_set) > len(distinct_validator_set):
+#                 distinct_validator_set = each_partition_distinct_validators_set
+#                 possible_partition_len = partition_len
+#
+#     if len(distinct_validator_set) > 2 and len(distinct_validator_set) >= ((possible_partition_len // 2) + 1):
+#         return True
+#     return False
+import random
 
-        for v in partition:
-            dis_set.add(v.split("_")[0])
 
-            if len(dis_set) > len(cand_dis_set):
-                cand_dis_set = dis_set
-                cand_partition_len = partition_len
-
-    if len(cand_dis_set) > 2 and len(cand_dis_set) >= ((cand_partition_len / 2) + 1):
-        return True
-
-    return False
-
-
-def getAllPossiblePartitions(validator_ids, partition_size, max_partitions):
+def getAllPossiblePartitions(validator_ids, partition_size, max_partitions, is_deterministic):
     all_Possible_Partitions = []
     t = int(count_part(len(validator_ids), partition_size))
     for i in range(t):
         x = gen_part(validator_ids, partition_size, i)
-        if isValid(x) and len(all_Possible_Partitions) < max_partitions:
-            all_Possible_Partitions.append(x)
+        all_Possible_Partitions.append(x)
 
-    return all_Possible_Partitions
+    if not is_deterministic:
+        random.shuffle(all_Possible_Partitions)
 
+    return all_Possible_Partitions[ : min(max_partitions, len(all_Possible_Partitions))]
 
 fact = [1]
 
@@ -82,6 +85,3 @@ def gen_part(A, k, i):
     subset = [A[0]] + ith_subset(A[1:], y, count_subset)
     S = set(subset)
     return [subset] + gen_part([a for a in A if a not in S], k - 1, count_partition)
-
-
-print(getAllPossiblePartitions(["1", "2", "3", "4", "3_twin"], 2, 10))
