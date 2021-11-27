@@ -21,15 +21,12 @@
 import random
 
 
-def getAllPossiblePartitions(validator_ids, partition_size, max_partitions, is_deterministic):
+def getAllPossiblePartitions(validator_ids, partition_size, max_partitions):
     all_Possible_Partitions = []
     t = int(count_part(len(validator_ids), partition_size))
     for i in range(t):
         x = gen_part(validator_ids, partition_size, i)
         all_Possible_Partitions.append(x)
-
-    if not is_deterministic:
-        random.shuffle(all_Possible_Partitions)
 
     return all_Possible_Partitions[ : min(max_partitions, len(all_Possible_Partitions))]
 

@@ -22,10 +22,10 @@ def generate_test_case(test_config: TestConfig):
 
     # Generate all possible partition scenarios as described in Step 1 of 4.2 in the Twins paper
     valid_partition_scenarios = generate_partition_scenarios(validator_twin_ids, test_config.num_non_empty_partition,
-                                                             test_config.enum_limit, test_config.is_deterministic)
+                                                             test_config.enum_limit)
 
     # Generates all possible leader partitions as described in Step 2 of 4.2 in the Twins paper
-    all_leader_partitions = generate_leader_partitions(valid_partition_scenarios, validator_ids,  test_config.is_deterministic,
+    all_leader_partitions = generate_leader_partitions(valid_partition_scenarios, validator_ids,
                                                        test_config.leader_type, test_config.enum_limit)
 
     all_leader_partitions_round_wise = generate_leader_partitions_with_rounds(all_leader_partitions,
@@ -42,7 +42,7 @@ def generate_test_case(test_config: TestConfig):
 #     return idx
 
 
-def generate_leader_partitions(partition_scenarios, all_validators, is_deterministic, leader_type):
+def generate_leader_partitions(partition_scenarios, all_validators, leader_type):
     leader_partitions_pair = []
 
     all_validator_ids = set()
@@ -61,8 +61,6 @@ def generate_leader_partitions(partition_scenarios, all_validators, is_determini
             elif leader_type == "NON-FAULTY" and validator not in faulty_validators_id_list:
                 leader_partitions_pair.append((validator, partition))
 
-    if not is_deterministic:
-        random.shuffle(leader_partitions_pair)
     return leader_partitions_pair
 
 
