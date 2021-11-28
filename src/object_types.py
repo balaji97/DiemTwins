@@ -51,7 +51,7 @@ class VoteMsg:
         self.high_commit_qc = high_commit_qc  # QC to synchronize on committed blocks
         self.sender = validator_id  # Added automatically when constructed
         # self.signature = self.ledger_commit_info
-        self.signature = Cryptography.sign_message(self.ledger_commit_info)
+        self.signature = Cryptography.sign_message(Cryptography.hash(self.ledger_commit_info))
 
 
 '''
@@ -117,7 +117,7 @@ class TimeoutInfo:
         else:
             high_qc_round = high_qc.vote_info.round
         self.author_signature = Cryptography.sign_message(
-            str(round)+","+str(high_qc_round))
+            Cryptography.hash(str(round)+","+str(high_qc_round)))
 
 
 '''
@@ -172,7 +172,7 @@ class ProposalMsg:
         self.last_round_tc = last_round_tc
         self.high_commit_qc = high_commit_qc  # QC to synchronize on committed blocks
         self.sender = validator_id
-        self.signature = Cryptography.sign_message(self.block.id)
+        self.signature = Cryptography.sign_message(Cryptography.hash(self.block.id))
 
 
 class Partition:
