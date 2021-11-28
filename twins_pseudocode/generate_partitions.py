@@ -1,34 +1,14 @@
 
-# Checks if in the given partition scenario eventually quorum exists or not for ensuring liveness property.
-# def isValidPartition(partition):
-#     distinct_validator_set = set()
-#     possible_partition_len = 0
-#
-#     for each_partition in partition:
-#         each_partition_distinct_validators_set = set()
-#         partition_len = len(each_partition_distinct_validators_set)
-#
-#         for validator_id in each_partition:
-#             each_partition_distinct_validators_set.add(validator_id.split("_")[0])
-#
-#             if len(each_partition_distinct_validators_set) > len(distinct_validator_set):
-#                 distinct_validator_set = each_partition_distinct_validators_set
-#                 possible_partition_len = partition_len
-#
-#     if len(distinct_validator_set) > 2 and len(distinct_validator_set) >= ((possible_partition_len // 2) + 1):
-#         return True
-#     return False
-import random
 
-
-def getAllPossiblePartitions(validator_ids, partition_size, max_partitions):
+def getAllPossiblePartitions(validator_ids, partition_size):
     all_Possible_Partitions = []
     t = int(count_part(len(validator_ids), partition_size))
     for i in range(t):
         x = gen_part(validator_ids, partition_size, i)
         all_Possible_Partitions.append(x)
+    print("STEP 1", len(all_Possible_Partitions))
+    return all_Possible_Partitions
 
-    return all_Possible_Partitions[ : min(max_partitions, len(all_Possible_Partitions))]
 
 fact = [1]
 

@@ -11,7 +11,7 @@ class TestConfig:
     # Number of validators that will have a twin
     n_twins: int
     # Maximum number of network partitions that will be created
-    enum_limit: int
+    batch_size:int
     # Maximum number of message types that can be dropped intra-partition
     n_intra_drop_types: int
     # Whether to generate test cases deterministically or not

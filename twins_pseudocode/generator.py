@@ -1,17 +1,30 @@
 import itertools
+import json
 import random
+from collections import defaultdict
 
 import generate_partitions
 
 from models import TestConfig
 
-msg_types=["VOTE","PROPOSAL"]
+
+class JsonObject:
+    def __init__(self, n_validators, n_twins, n_rounds, partition_size, twin_ids, drop_configs,
+                 round_leader_partitions):
+        self.n_validators = n_validators
+        self.n_twins = n_twins
+        self.n_rounds = n_rounds
+        self.partition_size = partition_size
+        self.twin_ids = twin_ids
+        self.round_leader_partitions = round_leader_partitions
+        self.drop_configs = drop_configs
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 
 def generate_test_case(test_config: TestConfig):
-    if test_config.seed is not None:
-        random.seed(test_config.seed)
-
+    test_cases_count = 0
     validator_ids = [i for i in range(1, test_config.n_validators + 1)]
     twin_ids = random.sample(validator_ids, test_config.n_twins)
 
@@ -21,27 +34,18 @@ def generate_test_case(test_config: TestConfig):
         validator_twin_ids.append(str(twin_id) + "_twin")
 
     # Generate all possible partition scenarios as described in Step 1 of 4.2 in the Twins paper
-    valid_partition_scenarios = generate_partition_scenarios(validator_twin_ids, test_config.num_non_empty_partition,
-                                                             test_config.enum_limit)
+    valid_partition_scenarios = generate_partition_scenarios(validator_twin_ids, test_config.num_non_empty_partition)
 
     # Generates all possible leader partitions as described in Step 2 of 4.2 in the Twins paper
     all_leader_partitions = generate_leader_partitions(valid_partition_scenarios, validator_ids,
-                                                       test_config.leader_type, test_config.enum_limit)
+                                                       test_config.leader_type)
 
-    all_leader_partitions_round_wise = generate_leader_partitions_with_rounds(all_leader_partitions,
-                                                        test_config.n_rounds, test_config.is_deterministic, test_config.is_with_replacement)
-
-
-# def getIdxForMaxlen(partition):
-#     idx = 0
-#     curr_len = 0
-#     for _idx, item in enumerate(partition):
-#         if len(item) > curr_len:
-#             curr_len = len(item)
-#             idx = _idx
-#     return idx
+    generate_leader_partitions_with_rounds(all_leader_partitions,
+        test_config.n_rounds, test_config.n_testcases, test_config.is_deterministic, test_config.is_with_replacement, test_config.num_non_empty_partition, test_config.n_twins,
+        validator_twin_ids, test_config.n_validators, test_config.leader_type, test_config.batch_size, test_cases_count)
 
 
+# Generate all the possible leader-partition pairs
 def generate_leader_partitions(partition_scenarios, all_validators, leader_type):
     leader_partitions_pair = []
 
@@ -60,54 +64,197 @@ def generate_leader_partitions(partition_scenarios, all_validators, leader_type)
 
             elif leader_type == "NON-FAULTY" and validator not in faulty_validators_id_list:
                 leader_partitions_pair.append((validator, partition))
-
+    print("STEP 2", len(leader_partitions_pair))
     return leader_partitions_pair
 
 
-def generate_leader_partitions_with_rounds(all_leader_partitions, n_rounds, is_deterministic, with_replacement):
-    all_leader_partition_pairs_round_wise = []
-    round_num = 0
-    leader_partition_pair_idx = 0
-    while round_num < n_rounds:
-        all_leader_partition_pairs_round_wise.append(all_leader_partitions[leader_partition_pair_idx])
-        leader_partition_pair_idx = (leader_partition_pair_idx + 1) % len(all_leader_partitions)
-        round_num += 1
-
-    if not is_deterministic:
-        random.shuffle(all_leader_partition_pairs_round_wise)
-    return all_leader_partition_pairs_round_wise
+# Return all the possible partition scenarios
+def generate_partition_scenarios(validator_ids, num_non_empty_partition):
+    return generate_partitions.getAllPossiblePartitions(validator_ids, num_non_empty_partition)
 
 
-def generate_partition_scenarios(validator_ids, num_non_empty_partition, max_partitions, is_deterministic):
-    return generate_partitions.getAllPossiblePartitions(validator_ids, num_non_empty_partition, max_partitions, is_deterministic)
-
-
-def getAllCombinations(self):
+def getMsgTypeCombinations():
+    msg_types = ["VOTE", "PROPOSAL"]
     all_combinations = []
-    stuff = msg_types
-    for L in range(0, len(stuff) + 1):
-        for subset in itertools.combinations(stuff, L):
-            if len(subset) != 0:
-                all_combinations.append(subset)
+    for num_subset in range(0, len(msg_types) + 1):
+        for comb in itertools.combinations(msg_types, num_subset):
+            all_combinations.append(list(comb))
     return all_combinations
 
 
-def getprobableDropConfig(self ):
-    all_permutation = self.getAllCombinations()
-    random.shuffle(all_permutation)
-    drop_config = [','.join(i) for i in all_permutation]
-    return drop_config[0]
+def getDropConfig():
+    all_drop_permutations = getMsgTypeCombinations()
+    random.shuffle(all_drop_permutations)
+    return all_drop_permutations[0]
 
 
-def generateDropConfig(self, round_num_list):
-    dropConfig = {}
-    for round in round_num_list:
-        dropConfig[round] = self.getprobableDropConfig()
+def generateDropConfig(round_num_list, partition_size):
+    dropConfig = defaultdict(list)
+    if round_num_list is None:
+        return dropConfig
 
+    for round_num in round_num_list:
+        for partition in range(partition_size):
+            dropConfig[round_num].append(getDropConfig())
     return dropConfig
 
 
-x = (generate_partitions.getAllPossiblePartitions(["1", "2", "3", "4", "3_twin"], 2, 10))
-print(generate_leader_partitions(x, True, "FAULTY", 10))
+# Combine rounds with leader-partition pairs with and without replacement.
+def generate_leader_partitions_with_rounds(all_leader_partitions, num_rounds, n_testcases, is_deterministic,
+                                              isWithReplacement, partition_size,n_twins, validator_twin_ids, n_validators,batch_size):
 
+    round_leader_partition_pairs = []
+    total_leader_partition = len(all_leader_partitions)
+    index_list = list(range(total_leader_partition))
+
+    if not is_deterministic:
+        random.shuffle(index_list)
+    count_testcases = 0
+
+    flag = False
+    if not isWithReplacement:
+        all_round_combinations = list(itertools.combinations(index_list, num_rounds))
+        # print("comb", len(all_round_combinations))
+        for each_combination in all_round_combinations:
+            all_permutations = list(itertools.permutations(each_combination))
+            # print("all_permutations ",all_permutations)
+            for permutation in all_permutations:
+                round_leader_partition_pairs.append(accumulate(permutation, all_leader_partitions, num_rounds, partition_size, n_twins, validator_twin_ids, n_validators))
+
+                if count_testcases == n_testcases:
+                    flag = True
+
+                if not flag and len(round_leader_partition_pairs) == batch_size:
+                    dump_file(round_leader_partition_pairs, count_testcases)
+                    round_leader_partition_pairs = []
+
+                elif flag and round_leader_partition_pairs:
+                    dump_file(round_leader_partition_pairs, count_testcases)
+                    break
+                count_testcases += 1
+    else:
+        permutations = [[] for i in range(total_leader_partition ** num_rounds)]
+        all_round_combinations_with_replacement = permutations_with_replacement(total_leader_partition, num_rounds, permutations, partition_size,n_twins, validator_twin_ids, n_validators, leader_type)
+        for permutation in all_round_combinations_with_replacement:
+            round_leader_partition_pairs.append(accumulate(permutation, all_leader_partitions, num_rounds, partition_size, n_twins, validator_twin_ids, n_validators))
+
+            if count_testcases == n_testcases:
+                flag = True
+
+            if not flag and len(round_leader_partition_pairs) == batch_size:
+                dump_file(round_leader_partition_pairs, count_testcases)
+                round_leader_partition_pairs = []
+
+            elif flag and round_leader_partition_pairs:
+                dump_file(round_leader_partition_pairs, count_testcases)
+                break
+            count_testcases += 1
+
+    print("STEP 3: ", len(round_leader_partition_pairs))
+
+
+def permutations_with_replacement(n, k, permutations):
+    m = 0
+    if k < 1:
+        return permutations
+
+    for i in range(27):
+        permutations[i].append(m % n)
+        if (i % n ** (k - 1)) == n ** (k - 1) - 1:
+            m = m + 1
+
+    return permutations_with_replacement(n, k - 1, permutations)
+
+
+def pad(l, size, padding):
+    return l + [padding] * abs((len(l) - size))
+
+
+def getNextSample(s, num_rounds):
+    sample = s[-num_rounds:]
+    del s[-num_rounds:]
+    sample = pad(sample, num_rounds, sample[-1])
+    return sample, s
+
+
+def accumulate(index_list, leader_partition_pairs, n_rounds, partition_size, n_twins, validator_twin_ids, n_validators):
+    random_IntraPartionRuleRounds = random.sample(list(range(n_rounds)), random.randint(0, n_rounds))
+    DropConfig = generateDropConfig(random_IntraPartionRuleRounds, partition_size)
+
+    candidate_configurations = [leader_partition_pairs[idx] for idx, item in enumerate(leader_partition_pairs) if
+                                idx in list(index_list)]
+
+    curr_test_case = JsonObject(n_validators, n_twins, n_rounds, partition_size,
+                                validator_twin_ids, DropConfig, candidate_configurations)
+
+    return curr_test_case.toJSON()
+
+
+def dump_file(returnList, file_count):
+    file_name: str = "testcases_batch_" + str(file_count) + ".jsonl"
+    textfile = open(file_name, "wb")
+    # file_count += 1
+    for element in returnList:
+        if element is not None:
+            textfile.write(element.encode())
+    textfile.close()
+
+# def combine_leader_partition_pairs_with_round(self, leader_partition_pairs_, num_rounds, isDeterministic,
+#                                               withReplacement):
+#
+#     round_leader_partition_pairs = []
+#     s = list(range(len(leader_partition_pairs_)))
+#
+#     if isDeterministic == False:
+#         random.shuffle(s)
+#
+#     returnList = []
+#
+#     terminate_flag = False
+#
+#     # sample,s=self.getNextSample(s,len(leader_partition_pairs_),num_rounds)
+#
+#     if withReplacement == False:
+#         all_samples = list(itertools.combinations(s, num_rounds))
+#         for sample in all_samples:
+#             all_permutations = list(itertools.permutations(sample))
+#             # print("all_permutations ",all_permutations)
+#             for i in all_permutations:
+#                 returnList.append(accumulate(i, leader_partition_pairs_))
+#
+#                 if len(returnList) == self.batch_size:
+#                     dump_file(returnList)
+#                     returnList = []
+#     else:
+#         # print("num_rounds",num_rounds)
+#         permutations = [[] for i in range(len(leader_partition_pairs_) ** num_rounds)]
+#         print("n", len(leader_partition_pairs_), " k:", num_rounds)
+#         all_samples = self.permutations_with_replacement(len(leader_partition_pairs_), num_rounds, permutations)
+#         for sample in all_samples:
+#             returnList.append(accumulate(sample, leader_partition_pairs_))
+#             if len(returnList) == self.batch_size:
+#                 self.dump_file(returnList)
+#                 returnList = []
+#
+#         # all_samples = list(itertools.combinations_with_replacement(s, num_rounds))
+#     print("len of all_samples", len(all_samples))
+#
+#     # self.testCaseslimit-=1
+#
+#     # if self.testCaseslimit==0:
+#     #     terminate_flag=True
+#     #     break
+#
+#     # if terminate_flag:
+#     #     break
+#
+#         print("Step 3 ", len(returnList))
+
+
+x = (generate_partitions.getAllPossiblePartitions(["1", "2", "3", "4", "3_twin"], 3))
+
+c = (generate_leader_partitions(x, ["1", "2", "3", "4", "3_twin"], "FAULTY"))
+
+generate_leader_partitions_with_rounds(all_leader_partitions=c, num_rounds=7, is_deterministic=True,isWithReplacement=False, partition_size=3,n_testcases=300, batch_size=100, n_twins=1,
+                                             validator_twin_ids=["3_twin"], n_validators=4)
 
