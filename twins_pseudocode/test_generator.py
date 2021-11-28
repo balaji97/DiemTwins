@@ -4,6 +4,7 @@ import random
 from twins_pseudocode.models import TestCase, LeaderPartition, TestConfig
 from twins_pseudocode import generate_partitions
 
+
 def generate_test_case(test_config: TestConfig):
     # Applies seed if present
     if test_config.seed is not None:
@@ -54,7 +55,7 @@ def enumerate_test_cases(leader_partitions, n_rounds, n_testcases):
 
 # Enumerates n_testcases number of leader_partition selection over n_rounds by random selection.
 # For each test case, we pick n_rounds number of leader_partition with replacement
-def randomly_generate_test_cases(leader_partitions, n_rounds, n_testcases):
+def randomly_generate_test_casesest_cases(leader_partitions, n_rounds, n_testcases):
     return [[random.choice(leader_partitions) for _ in range(n_rounds)] for _ in range(n_testcases)]
 
 
@@ -70,6 +71,7 @@ def generate_leader_partitions(partition_scenarios, all_validator_ids):
 
     return leader_partitions
 
+
 def generate_leader_partitions_with_rounds(all_leader_partitions, n_rounds):
     return []
 
@@ -80,13 +82,14 @@ def generate_leader_partitions_with_rounds(all_leader_partitions, n_rounds):
 # validator_ids: All the validator ids.
 # partition_size: size of each partition
 # max_partitions: maximum number of partitions
+
+
 def generate_partition_scenarios(validator_ids, partition_size, max_partitions):
     return generate_partitions.getAllPossiblePartitions(validator_ids, partition_size, max_partitions)
 
 
 # Returns a list of partitions after considering every partition to have up to n_message_drop_types
 # dropped intra-partition
-def enumerate_partition_scenarios_with_drops(partition_scenarios, n_message_drop_types):
     return []
 
 
