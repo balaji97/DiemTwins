@@ -137,6 +137,9 @@ class Validator (process):
         --SyncUpResponse
         await(block_id in self.block_cache)
 
+    # Checks if the hash matches
+    def verify_hash(data, hash):
+        return Cryptography.hash(data) == hash
 
     '''Procedure process proposal msg(P)'''
     def receive(msg=('Proposal', proposal_msg), from_=p):
@@ -145,7 +148,7 @@ class Validator (process):
         signature_verified = Cryptography.get_verified_message(
             proposal_msg.signature, public_keys_validators[proposal_msg.sender])
 
-        if signature_verified is not None:
+        if signature_verified is not None and verify_hash(proposal_msg.block.id, signature_verified):
             LOGGER.log_action("Verified ProposalMsg signature", True)
 
             parent_block_id = None
@@ -204,7 +207,7 @@ class Validator (process):
         signature_verified = Cryptography.get_verified_message(
             vote_msg.signature, public_keys_validators[vote_msg.sender])
 
-        if signature_verified is not None:
+        if signature_verified is not None and verify_hash(vote_msg.ledger_commit_info, signature_verified):
             LOGGER.log_action("Verified VoteMsg signature", True)
 
             # If we have not yet received the block being voted on, need to sync up
@@ -232,7 +235,12 @@ class Validator (process):
         signature_verified = Cryptography.get_verified_message(
             timeout_msg.tmo_info.author_signature, public_keys_validators[timeout_msg.tmo_info.author])
 
-        if signature_verified is not None:
+        if timeout_msg.tmo_info.high_qc is None:
+            tmo_sign_message = str(timeout_msg.tmo_info.round) + "," + str(None)
+        else:
+            tmo_sign_message = str(timeout_msg.tmo_info.round) + "," + str(timeout_msg.tmo_info.high_qc.vote_info.round)
+
+        if signature_verified is not None and verify_hash(tmo_sign_message, signature_verified):
             LOGGER.log_action("Verified TimeoutMsg signature", True)
 
             last_block_id = None
