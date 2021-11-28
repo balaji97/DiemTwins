@@ -1,26 +1,10 @@
 import itertools
-import json
 import random
 from collections import defaultdict
 
 import generate_partitions
 
-from models import TestConfig
-
-
-class JsonObject:
-    def __init__(self, n_validators, n_twins, n_rounds, partition_size, twin_ids, drop_configs,
-                 round_leader_partitions):
-        self.n_validators = n_validators
-        self.n_twins = n_twins
-        self.n_rounds = n_rounds
-        self.partition_size = partition_size
-        self.twin_ids = twin_ids
-        self.round_leader_partitions = round_leader_partitions
-        self.drop_configs = drop_configs
-
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
+from generator_models import TestConfig, JsonObject
 
 
 def generate_test_case(test_config: TestConfig):
@@ -196,7 +180,7 @@ def dump_file(returnList, file_count):
     # file_count += 1
     for element in returnList:
         if element is not None:
-            textfile.write(element.encode())
+            textfile.write(element.encode() + b"\n")
     textfile.close()
 
 # def combine_leader_partition_pairs_with_round(self, leader_partition_pairs_, num_rounds, isDeterministic,
@@ -251,10 +235,10 @@ def dump_file(returnList, file_count):
 #         print("Step 3 ", len(returnList))
 
 
-x = (generate_partitions.getAllPossiblePartitions(["1", "2", "3", "4", "3_twin"], 3))
+x = (generate_partitions.getAllPossiblePartitions(["1", "2", "3", "4", "3_twin"], 2))
 
 c = (generate_leader_partitions(x, ["1", "2", "3", "4", "3_twin"], "FAULTY"))
 
-generate_leader_partitions_with_rounds(all_leader_partitions=c, num_rounds=7, is_deterministic=True,isWithReplacement=False, partition_size=3,n_testcases=300, batch_size=100, n_twins=1,
+generate_leader_partitions_with_rounds(all_leader_partitions=c, num_rounds=4, is_deterministic=True,isWithReplacement=False, partition_size=2,n_testcases=100, batch_size=100, n_twins=1,
                                              validator_twin_ids=["3_twin"], n_validators=4)
 
