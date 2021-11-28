@@ -118,7 +118,7 @@ def generate_leader_partitions_with_rounds(all_leader_partitions, num_rounds, n_
                 count_testcases += 1
     else:
         permutations = [[] for i in range(total_leader_partition ** num_rounds)]
-        all_round_combinations_with_replacement = permutations_with_replacement(total_leader_partition, num_rounds, permutations, partition_size,n_twins, validator_twin_ids, n_validators, leader_type)
+        all_round_combinations_with_replacement = permutations_with_replacement(total_leader_partition, num_rounds, permutations)
         for permutation in all_round_combinations_with_replacement:
             round_leader_partition_pairs.append(accumulate(permutation, all_leader_partitions, num_rounds, partition_size, n_twins, validator_twin_ids, n_validators))
 
@@ -235,10 +235,10 @@ def dump_file(returnList, file_count):
 #         print("Step 3 ", len(returnList))
 
 
-x = (generate_partitions.getAllPossiblePartitions(["1", "2", "3", "4", "3_twin"], 2))
+x = (generate_partitions.getAllPossiblePartitions(["0", "1", "2", "3", "3_twin"], 2))
 
-c = (generate_leader_partitions(x, ["1", "2", "3", "4", "3_twin"], "FAULTY"))
+c = (generate_leader_partitions(x, ["0", "1", "2", "3", "3_twin"], "FAULTY"))
 
 generate_leader_partitions_with_rounds(all_leader_partitions=c, num_rounds=4, is_deterministic=True,isWithReplacement=False, partition_size=2,n_testcases=100, batch_size=100, n_twins=1,
-                                             validator_twin_ids=["3_twin"], n_validators=4)
+                                             validator_twin_ids=[3], n_validators=4)
 
