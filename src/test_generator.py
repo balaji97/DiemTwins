@@ -216,7 +216,7 @@ if os.path.exists('../testcases/') and os.path.isdir('../testcases/'):
 
 os.makedirs("../testcases/")
 
-x = (generate_partitions.getAllPossiblePartitions(["0", "1", "2", "3", "3_twin"], 2))
+x = (generate_partitions.get_all_possible_partitions(["0", "1", "2", "3", "3_twin"], 2))
 
 c = (generate_leader_partitions(x, ["0", "1", "2", "3", "3_twin"], "FAULTY"))
 
