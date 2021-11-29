@@ -1,3 +1,6 @@
+import sys
+sys.path.append("../config/")
+
 import itertools
 import os
 import random

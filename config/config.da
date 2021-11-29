@@ -1,7 +1,0 @@
-configs = [
-    {
-        'nvalidators': 4,
-        'nfaulty': 1,
-        'delta': 2
-    }
-]
