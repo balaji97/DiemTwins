@@ -1,32 +1,12 @@
 import itertools
+import os
 import random
+import shutil
 from collections import defaultdict
 
 import generate_partitions
 
-from generator_models import TestConfig, JsonObject
-
-
-def generate_test_case(test_config: TestConfig):
-    test_cases_count = 0
-    validator_ids = [i for i in range(1, test_config.n_validators + 1)]
-    twin_ids = random.sample(validator_ids, test_config.n_twins)
-
-    # Generate a list of all validators including twins
-    validator_twin_ids = [str(validator_id) for validator_id in validator_ids]
-    for twin_id in twin_ids:
-        validator_twin_ids.append(str(twin_id) + "_twin")
-
-    # Generate all possible partition scenarios as described in Step 1 of 4.2 in the Twins paper
-    valid_partition_scenarios = generate_partition_scenarios(validator_twin_ids, test_config.num_non_empty_partition)
-
-    # Generates all possible leader partitions as described in Step 2 of 4.2 in the Twins paper
-    all_leader_partitions = generate_leader_partitions(valid_partition_scenarios, validator_ids,
-                                                       test_config.leader_type)
-
-    generate_leader_partitions_with_rounds(all_leader_partitions,
-        test_config.n_rounds, test_config.n_testcases, test_config.is_deterministic, test_config.is_with_replacement, test_config.num_non_empty_partition, test_config.n_twins,
-        validator_twin_ids, test_config.n_validators, test_config.leader_type, test_config.batch_size, test_cases_count)
+from generator_models import JsonObject
 
 
 # Generate all the possible leader-partition pairs
@@ -175,7 +155,7 @@ def accumulate(index_list, leader_partition_pairs, n_rounds, partition_size, n_t
 
 
 def dump_file(returnList, file_count):
-    file_name: str = "testcases_batch_" + str(file_count) + ".jsonl"
+    file_name: str = "../testcases/testcases_batch_" + str(file_count) + ".jsonl"
     textfile = open(file_name, "wb")
     # file_count += 1
     for element in returnList:
@@ -234,11 +214,15 @@ def dump_file(returnList, file_count):
 #
 #         print("Step 3 ", len(returnList))
 
+if os.path.exists('../testcases/') and os.path.isdir('../testcases/'):
+    shutil.rmtree('../testcases/')
+
+os.makedirs("../testcases/")
 
 x = (generate_partitions.getAllPossiblePartitions(["0", "1", "2", "3", "3_twin"], 2))
 
 c = (generate_leader_partitions(x, ["0", "1", "2", "3", "3_twin"], "FAULTY"))
 
-generate_leader_partitions_with_rounds(all_leader_partitions=c, num_rounds=4, is_deterministic=True,isWithReplacement=False, partition_size=2,n_testcases=100, batch_size=100, n_twins=1,
+generate_leader_partitions_with_rounds(all_leader_partitions=c, num_rounds=4, is_deterministic=True,isWithReplacement=False, partition_size=2,n_testcases=100, batch_size=10, n_twins=1,
                                              validator_twin_ids=[3], n_validators=4)
 

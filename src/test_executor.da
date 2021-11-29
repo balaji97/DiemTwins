@@ -123,21 +123,22 @@ def main():
 
     # todo we will later read this from a file
     with open("testcases_batch_99.jsonl", "r") as test_file:
-        json_string = test_file.readline()
 
-    json_obj: JsonObject = json.loads(json_string, object_hook=JsonObject.object_decoder)
+        test_cases = [
+            TestCase(
+                n_rounds= json_obj.n_rounds,
+                n_validators=json_obj.n_validators,
+                leader_partitions=[LeaderPartition(round_leader_partition) for round_leader_partition in json_obj.round_leader_partitions],
+                twin_ids=json_obj.twin_ids,
+                delta=0.1
+            )
+            for json_obj in [
+                json.loads(json_string, object_hook=JsonObject.object_decoder)
+                    for json_string in test_file.readlines()
+            ]
+        ]
 
-    test_cases = [
-        TestCase(
-            n_rounds= json_obj.n_rounds,
-            n_validators=json_obj.n_validators,
-            leader_partitions=[LeaderPartition(round_leader_partition) for round_leader_partition in json_obj.round_leader_partitions],
-            twin_ids=json_obj.twin_ids,
-            delta=0.1
-        )
-    ]
-
-    for test_id, test_case in enumerate(test_cases):
+    for test_id, test_case in enumerate(test_cases[:10]):
         p = new(TestExecutor)
         setup(p, (test_case, test_id))
         start(p)
