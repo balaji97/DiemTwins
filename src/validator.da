@@ -57,10 +57,13 @@ class Validator (process):
         self.process_new_round_event(None)
 
         # We wait for the validator to complete n_rounds + 3 as per the design
-        await(self.pacemaker.current_round >= config['nrounds'] + 3)
+        if await(self.pacemaker.current_round >= config['nrounds'] + 3):
+            pass
+        elif timeout(4*(config['nrounds'] + 3)*config['delta']):
+            pass
 
         self.pacemaker.stop_timer(self.pacemaker.current_round)
-        output("Validator", self.validator_id, "is exiting")
+        # output("Validator", self.validator_id, "is exiting")
 
         super().send(('Done',), to=parent())
 
@@ -135,7 +138,10 @@ class Validator (process):
     def do_sync_up(to_process, block_id):
         super().send(('SyncUpRequest', block_id), to=to_process)
         --SyncUpResponse
-        await(block_id in self.block_cache)
+        if await(block_id in self.block_cache):
+            pass
+        elif timeout(4*config['delta']):
+            pass
 
     # Checks if the hash matches
     def verify_hash(data, hash):
@@ -271,8 +277,10 @@ class Validator (process):
             LOGGER.log_action("Verified TimeoutMsg signature", False)
 
     def receive(msg=('SyncUpRequest', block_id), from_=p):
+        LOGGER.log_action("Requesting sync up", block_id)
         super().send(('SyncUpResponse', self.block_cache[block_id]), to=p)
 
     def receive(msg=('SyncUpResponse', block), from_=p):
+        LOGGER.log_action("Received sync_up", block.id)
         sync_up_block(p, block)
 
