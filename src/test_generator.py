@@ -131,7 +131,7 @@ def pad(l, size, padding):
     return l + [padding] * abs((len(l) - size))
 
 
-def getNextSample(s, num_rounds):
+def get_next_sample(s, num_rounds):
     sample = s[-num_rounds:]
     del s[-num_rounds:]
     sample = pad(sample, num_rounds, sample[-1])
@@ -139,87 +139,41 @@ def getNextSample(s, num_rounds):
 
 
 def accumulate(index_list, leader_partition_pairs, n_rounds, partition_size, n_twins, validator_twin_ids, n_validators):
-    random_IntraPartionRuleRounds = random.sample(list(range(n_rounds)), random.randint(0, n_rounds))
-    DropConfig = generateDropConfig(random_IntraPartionRuleRounds, partition_size)
+    random_intra_partition_rule_rounds = random.sample(list(range(n_rounds)), random.randint(0, n_rounds))
+    drop_config = generateDropConfig(random_intra_partition_rule_rounds, partition_size)
 
     candidate_configurations = [leader_partition_pairs[idx] for idx, item in enumerate(leader_partition_pairs) if
                                 idx in list(index_list)]
 
     curr_test_case = JsonObject(n_validators, n_twins, n_rounds, partition_size,
-                                validator_twin_ids, DropConfig, candidate_configurations)
+                                validator_twin_ids, drop_config, candidate_configurations)
 
     return curr_test_case.toJSON()
 
 
-def dump_file(returnList, file_count):
+# Writes the list of JSON elements to file
+def dump_file(elements, file_count):
     file_name: str = "../testcases/testcases_batch_" + str(file_count) + ".jsonl"
-    textfile = open(file_name, "wb")
-    # file_count += 1
-    for element in returnList:
-        if element is not None:
-            textfile.write(element.encode() + b"\n")
-    textfile.close()
 
-# def combine_leader_partition_pairs_with_round(self, leader_partition_pairs_, num_rounds, isDeterministic,
-#                                               withReplacement):
-#
-#     round_leader_partition_pairs = []
-#     s = list(range(len(leader_partition_pairs_)))
-#
-#     if isDeterministic == False:
-#         random.shuffle(s)
-#
-#     returnList = []
-#
-#     terminate_flag = False
-#
-#     # sample,s=self.getNextSample(s,len(leader_partition_pairs_),num_rounds)
-#
-#     if withReplacement == False:
-#         all_samples = list(itertools.combinations(s, num_rounds))
-#         for sample in all_samples:
-#             all_permutations = list(itertools.permutations(sample))
-#             # print("all_permutations ",all_permutations)
-#             for i in all_permutations:
-#                 returnList.append(accumulate(i, leader_partition_pairs_))
-#
-#                 if len(returnList) == self.batch_size:
-#                     dump_file(returnList)
-#                     returnList = []
-#     else:
-#         # print("num_rounds",num_rounds)
-#         permutations = [[] for i in range(len(leader_partition_pairs_) ** num_rounds)]
-#         print("n", len(leader_partition_pairs_), " k:", num_rounds)
-#         all_samples = self.permutations_with_replacement(len(leader_partition_pairs_), num_rounds, permutations)
-#         for sample in all_samples:
-#             returnList.append(accumulate(sample, leader_partition_pairs_))
-#             if len(returnList) == self.batch_size:
-#                 self.dump_file(returnList)
-#                 returnList = []
-#
-#         # all_samples = list(itertools.combinations_with_replacement(s, num_rounds))
-#     print("len of all_samples", len(all_samples))
-#
-#     # self.testCaseslimit-=1
-#
-#     # if self.testCaseslimit==0:
-#     #     terminate_flag=True
-#     #     break
-#
-#     # if terminate_flag:
-#     #     break
-#
-#         print("Step 3 ", len(returnList))
+    with open(file_name, "wb") as outfile:
+        for element in elements:
+            if element is not None:
+                outfile.write(element.encode() + b"\n")
 
-if os.path.exists('../testcases/') and os.path.isdir('../testcases/'):
-    shutil.rmtree('../testcases/')
 
-os.makedirs("../testcases/")
+def main():
+    # Clear testcase directory
+    if os.path.exists('../testcases/') and os.path.isdir('../testcases/'):
+        shutil.rmtree('../testcases/')
 
-x = (generate_partitions.get_all_possible_partitions(["0", "1", "2", "3", "3_twin"], 2))
+    os.makedirs("../testcases/")
 
-c = (generate_leader_partitions(x, ["0", "1", "2", "3", "3_twin"], "FAULTY"))
+    x = generate_partitions.get_all_possible_partitions(["0", "1", "2", "3", "3_twin"], 2)
 
-generate_leader_partitions_with_rounds(all_leader_partitions=c, num_rounds=4, is_deterministic=True,isWithReplacement=False, partition_size=2,n_testcases=50, batch_size=20, n_twins=1,
-                                             validator_twin_ids=[3], n_validators=4)
+    c = generate_leader_partitions(x, ["0", "1", "2", "3", "3_twin"], "FAULTY")
 
+    generate_leader_partitions_with_rounds(all_leader_partitions=c, num_rounds=4, is_deterministic=True,isWithReplacement=False, partition_size=2,n_testcases=50, batch_size=20, n_twins=1,
+                                                 validator_twin_ids=[3], n_validators=4)
+
+if __name__ == "__main__":
+    main()
