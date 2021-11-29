@@ -12,7 +12,7 @@ from generator_config import generator_config
 
 # Generate all the possible leader-partition pairs
 def generate_leader_partitions(partition_scenarios, validator_ids, twin_ids, leader_type):
-    leader_partitions_pair = []
+    leader_partitions_pairs = []
 
     all_validator_ids = set()
     [all_validator_ids.update(partition) for partition in partition_scenarios[0]]
@@ -22,46 +22,21 @@ def generate_leader_partitions(partition_scenarios, validator_ids, twin_ids, lea
     for partition in partition_scenarios:
         for validator_id in validator_ids:
             if leader_type == "ALL":
-                leader_partitions_pair.append((validator_id, partition))
+                leader_partitions_pairs.append((validator_id, partition))
             elif leader_type == "FAULTY" and validator_id in twin_ids:
-                leader_partitions_pair.append((validator_id, partition))
+                leader_partitions_pairs.append((validator_id, partition))
             elif leader_type == "NON-FAULTY" and validator_id not in faulty_validators_id_list:
-                leader_partitions_pair.append((validator_id, partition))
+                leader_partitions_pairs.append((validator_id, partition))
 
-    return leader_partitions_pair
-
-def get_msg_type_combinations():
-    msg_types = ["VOTE", "PROPOSAL"]
-    all_combinations = []
-    for num_subset in range(0, len(msg_types) + 1):
-        for comb in itertools.combinations(msg_types, num_subset):
-            all_combinations.append(list(comb))
-    return all_combinations
-
-
-def get_drop_config():
-    all_drop_permutations = get_msg_type_combinations()
-    random.shuffle(all_drop_permutations)
-    return all_drop_permutations[0]
-
-
-def generate_drop_config(round_num_list, partition_size):
-    drop_config = defaultdict(list)
-    if round_num_list is None:
-        return drop_config
-
-    for round_num in round_num_list:
-        for partition in range(partition_size):
-            drop_config[round_num].append(get_drop_config())
-    return drop_config
+    return leader_partitions_pairs
 
 
 # Combine rounds with leader-partition pairs with and without replacement.
-def generate_leader_partitions_with_rounds(all_leader_partitions, num_rounds, n_testcases, is_deterministic,
-                                           is_with_replacement, partition_size, n_twins, validator_twin_ids, n_validators, batch_size):
+def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_rounds, n_testcases, is_deterministic,
+                                                 is_with_replacement, partition_size, n_twins, validator_twin_ids, n_validators, batch_size):
 
     round_leader_partition_pairs = []
-    total_leader_partition = len(all_leader_partitions)
+    total_leader_partition = len(leader_partition_pairs)
     index_list = list(range(total_leader_partition))
 
     if not is_deterministic:
@@ -70,13 +45,13 @@ def generate_leader_partitions_with_rounds(all_leader_partitions, num_rounds, n_
 
     flag = False
     if not is_with_replacement:
-        all_round_combinations = list(itertools.combinations(index_list, num_rounds))
+        all_round_combinations = list(itertools.combinations(index_list, n_rounds))
         # print("comb", len(all_round_combinations))
         for each_combination in all_round_combinations:
             all_permutations = list(itertools.permutations(each_combination))
             # print("all_permutations ",all_permutations)
             for permutation in all_permutations:
-                round_leader_partition_pairs.append(accumulate(permutation, all_leader_partitions, num_rounds, partition_size, n_twins, validator_twin_ids, n_validators))
+                round_leader_partition_pairs.append(accumulate(permutation, leader_partition_pairs, n_rounds, partition_size, n_twins, validator_twin_ids, n_validators))
                 count_testcases += 1
 
                 if count_testcases == n_testcases:
@@ -93,10 +68,11 @@ def generate_leader_partitions_with_rounds(all_leader_partitions, num_rounds, n_
             if flag:
                 break
     else:
-        permutations = [[] for i in range(total_leader_partition ** num_rounds)]
-        all_round_combinations_with_replacement = permutations_with_replacement(total_leader_partition, num_rounds, permutations)
+        permutations = [[] for i in range(total_leader_partition ** n_rounds)]
+        all_round_combinations_with_replacement = permutations_with_replacement(total_leader_partition, n_rounds, permutations)
         for permutation in all_round_combinations_with_replacement:
-            round_leader_partition_pairs.append(accumulate(permutation, all_leader_partitions, num_rounds, partition_size, n_twins, validator_twin_ids, n_validators))
+            round_leader_partition_pairs.append(accumulate(permutation, leader_partition_pairs, n_rounds, partition_size, n_twins, validator_twin_ids, n_validators))
+            count_testcases += 1
 
             if count_testcases == n_testcases:
                 flag = True
@@ -108,7 +84,33 @@ def generate_leader_partitions_with_rounds(all_leader_partitions, num_rounds, n_
             elif flag and round_leader_partition_pairs:
                 dump_file(round_leader_partition_pairs, count_testcases)
                 break
-            count_testcases += 1
+
+
+
+def generate_drop_config(round_num_list, partition_size):
+    drop_config = defaultdict(list)
+    if round_num_list is None:
+        return drop_config
+
+    for round_num in round_num_list:
+        for partition in range(partition_size):
+            drop_config[round_num].append(get_drop_config())
+    return drop_config
+
+
+def get_drop_config():
+    all_drop_permutations = get_msg_type_combinations()
+    random.shuffle(all_drop_permutations)
+    return all_drop_permutations[0]
+
+
+def get_msg_type_combinations():
+    msg_types = ["VOTE", "PROPOSAL"]
+    all_combinations = []
+    for num_subset in range(0, len(msg_types) + 1):
+        for comb in itertools.combinations(msg_types, num_subset):
+            all_combinations.append(list(comb))
+    return all_combinations
 
 
 def permutations_with_replacement(n, k, permutations):
@@ -170,16 +172,18 @@ def main():
     validator_and_twin_ids = [str(validator_id) for validator_id in validator_ids] \
                 + [str(validator_id) + "_twin" for validator_id in twin_ids]
 
-
+    # Step 1
     partition_scenarios = generate_partitions.get_all_possible_partitions(
         validator_and_twin_ids, generator_config['n_partitions'])
 
+    # Step 2
     leader_partition_pairs = generate_leader_partitions(
         partition_scenarios, validator_ids, twin_ids, generator_config['allowed_leader_type'])
 
-    generate_leader_partitions_with_rounds(all_leader_partitions=leader_partition_pairs, num_rounds=4, is_deterministic=True,
-                                           is_with_replacement=False, partition_size=2, n_testcases=50, batch_size=20, n_twins=1,
-                                           validator_twin_ids=[3], n_validators=4)
+    # Step 3
+    enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs=leader_partition_pairs, n_rounds=4, is_deterministic=True,
+                                                 is_with_replacement=False, partition_size=2, n_testcases=50, batch_size=20, n_twins=1,
+                                                 validator_twin_ids=[3], n_validators=4)
 
 if __name__ == "__main__":
     main()
