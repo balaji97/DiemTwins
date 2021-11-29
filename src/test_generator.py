@@ -66,7 +66,7 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
 
     else:
         if is_deterministic:
-            permutations = [[] for i in range(total_leader_partition ** n_rounds)]
+            permutations = [[] for _ in range(total_leader_partition ** n_rounds)]
             all_round_combinations = permutations_with_replacement(total_leader_partition, n_rounds,
                                                                                     permutations)
         else:
@@ -109,21 +109,8 @@ def permutations_with_replacement(n, k, permutations):
     return permutations_with_replacement(n, k - 1, permutations)
 
 
-def pad(l, size, padding):
-    return l + [padding] * abs((len(l) - size))
-
-
-def get_next_sample(s, num_rounds):
-    sample = s[-num_rounds:]
-    del s[-num_rounds:]
-    sample = pad(sample, num_rounds, sample[-1])
-    return sample, s
-
-
 def accumulate(index_list, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators):
-
     round_leader_partitions = [leader_partition_pairs[idx] for idx in index_list]
-
     curr_test_case = JsonObject(n_validators, n_rounds, validator_twin_ids, round_leader_partitions)
 
     return curr_test_case.toJSON()
@@ -174,6 +161,7 @@ def main():
                                                  is_with_replacement=generator_config['is_with_replacement'],
                                                  validator_twin_ids=twin_ids, n_validators=len(validator_ids),
                                                  batch_size=generator_config['test_file_batch_size'])
+
 
 if __name__ == "__main__":
     main()
