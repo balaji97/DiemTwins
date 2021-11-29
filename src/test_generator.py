@@ -56,12 +56,10 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
     total_leader_partition = len(leader_partition_pairs)
     index_list = list(range(total_leader_partition))
 
-    if not is_deterministic:
-        random.shuffle(index_list)
     count_testcases = 0
 
     flag = False
-    if not is_with_replacement:
+    if not is_with_replacement and is_deterministic:
         all_round_combinations = list(itertools.combinations(index_list, n_rounds))
 
         for each_combination in all_round_combinations:
@@ -86,9 +84,15 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
             if flag:
                 break
     else:
-        permutations = [[] for i in range(total_leader_partition ** n_rounds)]
-        all_round_combinations_with_replacement = permutations_with_replacement(total_leader_partition, n_rounds, permutations)
-        for permutation in all_round_combinations_with_replacement:
+        if is_deterministic:
+            permutations = [[] for i in range(total_leader_partition ** n_rounds)]
+            all_round_combinations = permutations_with_replacement(total_leader_partition, n_rounds,
+                                                                                    permutations)
+        else:
+            all_round_combinations = enumerate_randomized(leader_partition_pairs, n_rounds, n_testcases)
+
+
+        for permutation in all_round_combinations:
             round_leader_partition_pairs.append(
                 accumulate(permutation, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators))
             count_testcases += 1
@@ -104,6 +108,9 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
                 dump_file(round_leader_partition_pairs, count_testcases)
                 break
 
+
+def enumerate_randomized(leader_partition_pairs, n_rounds, n_test_cases):
+    return [[random.choice(leader_partition_pairs) for _ in range(n_rounds)] for _ in range(n_test_cases)]
 
 
 def permutations_with_replacement(n, k, permutations):
@@ -156,6 +163,9 @@ def main():
         shutil.rmtree('../testcases/')
 
     os.makedirs("../testcases/")
+
+    if 'seed' in generator_config:
+        random.seed(generator_config['seed'])
 
     validator_ids = [validator_id for validator_id in range(generator_config['n_validators'])]
     twin_ids = [validator_id for validator_id in range(generator_config['n_twins'])]
