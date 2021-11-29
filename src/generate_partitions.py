@@ -1,4 +1,5 @@
-
+fact = [1]
+cache = {}
 
 def getAllPossiblePartitions(validator_ids, partition_size):
     all_Possible_Partitions = []
@@ -8,18 +9,6 @@ def getAllPossiblePartitions(validator_ids, partition_size):
         all_Possible_Partitions.append(x)
     print("STEP 1", len(all_Possible_Partitions))
     return all_Possible_Partitions
-
-
-fact = [1]
-
-
-def nCr(n, k):
-    while len(fact) <= n:
-        fact.append(fact[-1] * len(fact))
-    return fact[n] / (fact[k] * fact[n - k])
-
-
-cache = {}
 
 
 def count_part(n, k):
@@ -35,20 +24,6 @@ def count_part(n, k):
     return t
 
 
-def ith_subset(A, k, i):
-    n = len(A)
-    if n == k:
-        return A
-    if k == 0:
-        return []
-    for x in range(n):
-        extra = nCr(n - x - 1, k - 1)
-        if i < extra:
-            break
-        i -= extra
-    return [A[x]] + ith_subset(A[x + 1:], k - 1, i)
-
-
 def gen_part(A, k, i):
     if k == 1:
         return [A]
@@ -62,3 +37,23 @@ def gen_part(A, k, i):
     subset = [A[0]] + ith_subset(A[1:], y, count_subset)
     S = set(subset)
     return [subset] + gen_part([a for a in A if a not in S], k - 1, count_partition)
+
+
+def nCr(n, k):
+    while len(fact) <= n:
+        fact.append(fact[-1] * len(fact))
+    return fact[n] / (fact[k] * fact[n - k])
+
+
+def ith_subset(A, k, i):
+    n = len(A)
+    if n == k:
+        return A
+    if k == 0:
+        return []
+    for x in range(n):
+        extra = nCr(n - x - 1, k - 1)
+        if i < extra:
+            break
+        i -= extra
+    return [A[x]] + ith_subset(A[x + 1:], k - 1, i)

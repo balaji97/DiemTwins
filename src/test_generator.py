@@ -31,12 +31,6 @@ def generate_leader_partitions(partition_scenarios, all_validators, leader_type)
     print("STEP 2", len(leader_partitions_pair))
     return leader_partitions_pair
 
-
-# Return all the possible partition scenarios
-def generate_partition_scenarios(validator_ids, num_non_empty_partition):
-    return generate_partitions.getAllPossiblePartitions(validator_ids, num_non_empty_partition)
-
-
 def getMsgTypeCombinations():
     msg_types = ["VOTE", "PROPOSAL"]
     all_combinations = []
