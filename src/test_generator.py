@@ -29,6 +29,8 @@ def generate_leader_partitions(partition_scenarios, validator_ids, twin_ids, lea
 
     return leader_partitions_pairs
 
+
+# Combine leader-partition pairs with every kind of drop type
 def enumerate_leader_partitions_with_drops(leader_partitions, drop_types):
     drop_types = drop_types[:2]
     result = []
