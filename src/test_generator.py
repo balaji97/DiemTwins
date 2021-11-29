@@ -2,7 +2,6 @@ import itertools
 import os
 import random
 import shutil
-from collections import defaultdict
 
 import generate_partitions
 
@@ -49,8 +48,7 @@ def enumerate_leader_partitions_with_drops(leader_partitions, drop_types):
 
 # Combine rounds with leader-partition pairs with and without replacement.
 def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_rounds, n_testcases, is_deterministic,
-                                                 is_with_replacement, partition_size, validator_twin_ids, n_validators,
-                                                 batch_size):
+                                                 is_with_replacement, validator_twin_ids, n_validators, batch_size):
 
     round_leader_partition_pairs = []
     total_leader_partition = len(leader_partition_pairs)
@@ -180,7 +178,6 @@ def main():
                                                  n_testcases=generator_config['n_testcases'],
                                                  is_deterministic=generator_config['is_deterministic'],
                                                  is_with_replacement=generator_config['is_with_replacement'],
-                                                 partition_size=generator_config['n_partitions'],
                                                  validator_twin_ids=twin_ids, n_validators=len(validator_ids),
                                                  batch_size=generator_config['test_file_batch_size'])
 
