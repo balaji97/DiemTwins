@@ -33,7 +33,8 @@ def generate_leader_partitions(partition_scenarios, validator_ids, twin_ids, lea
 
 # Combine rounds with leader-partition pairs with and without replacement.
 def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_rounds, n_testcases, is_deterministic,
-                                                 is_with_replacement, partition_size, n_twins, validator_twin_ids, n_validators, batch_size):
+                                                 is_with_replacement, partition_size, validator_twin_ids, n_validators,
+                                                 batch_size):
 
     round_leader_partition_pairs = []
     total_leader_partition = len(leader_partition_pairs)
@@ -46,10 +47,10 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
     flag = False
     if not is_with_replacement:
         all_round_combinations = list(itertools.combinations(index_list, n_rounds))
-        # print("comb", len(all_round_combinations))
+
         for each_combination in all_round_combinations:
             all_permutations = list(itertools.permutations(each_combination))
-            # print("all_permutations ",all_permutations)
+
             for permutation in all_permutations:
                 round_leader_partition_pairs.append(
                     accumulate(permutation, leader_partition_pairs, n_rounds, partition_size, validator_twin_ids,
@@ -184,12 +185,14 @@ def main():
         partition_scenarios, validator_ids, twin_ids, generator_config['allowed_leader_type'])
 
     # Step 3
-    enumerate_leader_partition_pairs_over_rounds(
-        leader_partition_pairs=leader_partition_pairs, n_rounds=generator_config['n_rounds'],
-        is_deterministic=generator_config['is_deterministic'], is_with_replacement=generator_config['is_with_replacement'],
-        partition_size=generator_config['n_partitions'], n_testcases=generator_config['n_testcases'],
-        batch_size=generator_config['test_file_batch_size'], n_twins=len(twin_ids), validator_twin_ids=twin_ids,
-        n_validators=len(validator_ids))
+    enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs=leader_partition_pairs,
+                                                 n_rounds=generator_config['n_rounds'],
+                                                 n_testcases=generator_config['n_testcases'],
+                                                 is_deterministic=generator_config['is_deterministic'],
+                                                 is_with_replacement=generator_config['is_with_replacement'],
+                                                 partition_size=generator_config['n_partitions'],
+                                                 validator_twin_ids=twin_ids, n_validators=len(validator_ids),
+                                                 batch_size=generator_config['test_file_batch_size'])
 
 if __name__ == "__main__":
     main()
