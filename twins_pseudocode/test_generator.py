@@ -85,7 +85,7 @@ def generate_leader_partitions_with_rounds(all_leader_partitions, n_rounds):
 
 
 def generate_partition_scenarios(validator_ids, partition_size, max_partitions):
-    return generate_partitions.getAllPossiblePartitions(validator_ids, partition_size, max_partitions)
+    return generate_partitions.get_all_possible_partitions(validator_ids, partition_size, max_partitions)
 
 
 # Returns a list of partitions after considering every partition to have up to n_message_drop_types

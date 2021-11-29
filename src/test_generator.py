@@ -7,10 +7,11 @@ from collections import defaultdict
 import generate_partitions
 
 from generator_models import JsonObject
+from generator_config import generator_config
 
 
 # Generate all the possible leader-partition pairs
-def generate_leader_partitions(partition_scenarios, all_validators, leader_type):
+def generate_leader_partitions(partition_scenarios, validator_ids, twin_ids, leader_type):
     leader_partitions_pair = []
 
     all_validator_ids = set()
@@ -19,19 +20,17 @@ def generate_leader_partitions(partition_scenarios, all_validators, leader_type)
     faulty_validators_id_list = [validatorId.split("_")[0] for validatorId in all_validator_ids if len(validatorId.split("_")) > 1]
 
     for partition in partition_scenarios:
-        for validator in all_validators:
+        for validator_id in validator_ids:
             if leader_type == "ALL":
-                leader_partitions_pair.append((validator, partition))
+                leader_partitions_pair.append((validator_id, partition))
+            elif leader_type == "FAULTY" and validator_id in twin_ids:
+                leader_partitions_pair.append((validator_id, partition))
+            elif leader_type == "NON-FAULTY" and validator_id not in faulty_validators_id_list:
+                leader_partitions_pair.append((validator_id, partition))
 
-            elif leader_type == "FAULTY" and validator in faulty_validators_id_list:
-                leader_partitions_pair.append((validator, partition))
-
-            elif leader_type == "NON-FAULTY" and validator not in faulty_validators_id_list:
-                leader_partitions_pair.append((validator, partition))
-    print("STEP 2", len(leader_partitions_pair))
     return leader_partitions_pair
 
-def getMsgTypeCombinations():
+def get_msg_type_combinations():
     msg_types = ["VOTE", "PROPOSAL"]
     all_combinations = []
     for num_subset in range(0, len(msg_types) + 1):
@@ -40,26 +39,26 @@ def getMsgTypeCombinations():
     return all_combinations
 
 
-def getDropConfig():
-    all_drop_permutations = getMsgTypeCombinations()
+def get_drop_config():
+    all_drop_permutations = get_msg_type_combinations()
     random.shuffle(all_drop_permutations)
     return all_drop_permutations[0]
 
 
-def generateDropConfig(round_num_list, partition_size):
-    dropConfig = defaultdict(list)
+def generate_drop_config(round_num_list, partition_size):
+    drop_config = defaultdict(list)
     if round_num_list is None:
-        return dropConfig
+        return drop_config
 
     for round_num in round_num_list:
         for partition in range(partition_size):
-            dropConfig[round_num].append(getDropConfig())
-    return dropConfig
+            drop_config[round_num].append(get_drop_config())
+    return drop_config
 
 
 # Combine rounds with leader-partition pairs with and without replacement.
 def generate_leader_partitions_with_rounds(all_leader_partitions, num_rounds, n_testcases, is_deterministic,
-                                              isWithReplacement, partition_size,n_twins, validator_twin_ids, n_validators,batch_size):
+                                           is_with_replacement, partition_size, n_twins, validator_twin_ids, n_validators, batch_size):
 
     round_leader_partition_pairs = []
     total_leader_partition = len(all_leader_partitions)
@@ -70,7 +69,7 @@ def generate_leader_partitions_with_rounds(all_leader_partitions, num_rounds, n_
     count_testcases = 0
 
     flag = False
-    if not isWithReplacement:
+    if not is_with_replacement:
         all_round_combinations = list(itertools.combinations(index_list, num_rounds))
         # print("comb", len(all_round_combinations))
         for each_combination in all_round_combinations:
@@ -111,8 +110,6 @@ def generate_leader_partitions_with_rounds(all_leader_partitions, num_rounds, n_
                 break
             count_testcases += 1
 
-    print("STEP 3: ", len(round_leader_partition_pairs))
-
 
 def permutations_with_replacement(n, k, permutations):
     m = 0
@@ -140,7 +137,7 @@ def get_next_sample(s, num_rounds):
 
 def accumulate(index_list, leader_partition_pairs, n_rounds, partition_size, n_twins, validator_twin_ids, n_validators):
     random_intra_partition_rule_rounds = random.sample(list(range(n_rounds)), random.randint(0, n_rounds))
-    drop_config = generateDropConfig(random_intra_partition_rule_rounds, partition_size)
+    drop_config = generate_drop_config(random_intra_partition_rule_rounds, partition_size)
 
     candidate_configurations = [leader_partition_pairs[idx] for idx, item in enumerate(leader_partition_pairs) if
                                 idx in list(index_list)]
@@ -168,12 +165,21 @@ def main():
 
     os.makedirs("../testcases/")
 
-    x = generate_partitions.get_all_possible_partitions(["0", "1", "2", "3", "3_twin"], 2)
+    validator_ids = [validator_id for validator_id in range(generator_config['n_validators'])]
+    twin_ids = [validator_id for validator_id in range(generator_config['n_twins'])]
+    validator_and_twin_ids = [str(validator_id) for validator_id in validator_ids] \
+                + [str(validator_id) + "_twin" for validator_id in twin_ids]
 
-    c = generate_leader_partitions(x, ["0", "1", "2", "3", "3_twin"], "FAULTY")
 
-    generate_leader_partitions_with_rounds(all_leader_partitions=c, num_rounds=4, is_deterministic=True,isWithReplacement=False, partition_size=2,n_testcases=50, batch_size=20, n_twins=1,
-                                                 validator_twin_ids=[3], n_validators=4)
+    partition_scenarios = generate_partitions.get_all_possible_partitions(
+        validator_and_twin_ids, generator_config['n_partitions'])
+
+    leader_partition_pairs = generate_leader_partitions(
+        partition_scenarios, validator_ids, twin_ids, generator_config['allowed_leader_type'])
+
+    generate_leader_partitions_with_rounds(all_leader_partitions=leader_partition_pairs, num_rounds=4, is_deterministic=True,
+                                           is_with_replacement=False, partition_size=2, n_testcases=50, batch_size=20, n_twins=1,
+                                           validator_twin_ids=[3], n_validators=4)
 
 if __name__ == "__main__":
     main()
