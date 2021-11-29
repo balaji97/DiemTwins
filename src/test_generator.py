@@ -30,6 +30,22 @@ def generate_leader_partitions(partition_scenarios, validator_ids, twin_ids, lea
 
     return leader_partitions_pairs
 
+def enumerate_leader_partitions_with_drops(leader_partitions, drop_types):
+    drop_types = drop_types[:2]
+    result = []
+    drop_scenarios = [[]]
+
+    if len(drop_types) > 0:
+        drop_scenarios.append(drop_types)
+
+    if len(drop_types) > 1:
+        drop_scenarios += [[drop_type] for drop_type in drop_types]
+
+    for leader, partition in leader_partitions:
+        for drop_scenario in drop_scenarios:
+            result.append((leader, partition, drop_scenario))
+
+    return result
 
 # Combine rounds with leader-partition pairs with and without replacement.
 def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_rounds, n_testcases, is_deterministic,
@@ -53,8 +69,7 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
 
             for permutation in all_permutations:
                 round_leader_partition_pairs.append(
-                    accumulate(permutation, leader_partition_pairs, n_rounds, partition_size, validator_twin_ids,
-                               n_validators))
+                    accumulate(permutation, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators))
                 count_testcases += 1
 
                 if count_testcases == n_testcases:
@@ -75,8 +90,7 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
         all_round_combinations_with_replacement = permutations_with_replacement(total_leader_partition, n_rounds, permutations)
         for permutation in all_round_combinations_with_replacement:
             round_leader_partition_pairs.append(
-                accumulate(permutation, leader_partition_pairs, n_rounds, partition_size, validator_twin_ids,
-                           n_validators))
+                accumulate(permutation, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators))
             count_testcases += 1
 
             if count_testcases == n_testcases:
@@ -90,32 +104,6 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
                 dump_file(round_leader_partition_pairs, count_testcases)
                 break
 
-
-
-def generate_drop_config(round_num_list, partition_size):
-    drop_config = defaultdict(list)
-    if round_num_list is None:
-        return drop_config
-
-    for round_num in round_num_list:
-        for partition in range(partition_size):
-            drop_config[round_num].append(get_drop_config())
-    return drop_config
-
-
-def get_drop_config():
-    all_drop_permutations = get_msg_type_combinations()
-    random.shuffle(all_drop_permutations)
-    return all_drop_permutations[0]
-
-
-def get_msg_type_combinations():
-    msg_types = ["VOTE", "PROPOSAL"]
-    all_combinations = []
-    for num_subset in range(0, len(msg_types) + 1):
-        for comb in itertools.combinations(msg_types, num_subset):
-            all_combinations.append(list(comb))
-    return all_combinations
 
 
 def permutations_with_replacement(n, k, permutations):
@@ -142,14 +130,12 @@ def get_next_sample(s, num_rounds):
     return sample, s
 
 
-def accumulate(index_list, leader_partition_pairs, n_rounds, partition_size, validator_twin_ids, n_validators):
-    random_intra_partition_rule_rounds = random.sample(list(range(n_rounds)), random.randint(0, n_rounds))
-    drop_config = generate_drop_config(random_intra_partition_rule_rounds, partition_size)
+def accumulate(index_list, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators):
 
     round_leader_partitions = [leader_partition_pairs[idx] for idx, item in enumerate(leader_partition_pairs) if
                                 idx in list(index_list)]
 
-    curr_test_case = JsonObject(n_validators, n_rounds, validator_twin_ids, drop_config, round_leader_partitions)
+    curr_test_case = JsonObject(n_validators, n_rounds, validator_twin_ids, round_leader_partitions)
 
     return curr_test_case.toJSON()
 
@@ -184,8 +170,12 @@ def main():
     leader_partition_pairs = generate_leader_partitions(
         partition_scenarios, validator_ids, twin_ids, generator_config['allowed_leader_type'])
 
+    # Adding message drops
+    leader_partitions_with_drops = enumerate_leader_partitions_with_drops(
+        leader_partition_pairs, generator_config['intra_partition_drop_types'])
+
     # Step 3
-    enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs=leader_partition_pairs,
+    enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs=leader_partitions_with_drops,
                                                  n_rounds=generator_config['n_rounds'],
                                                  n_testcases=generator_config['n_testcases'],
                                                  is_deterministic=generator_config['is_deterministic'],
