@@ -48,7 +48,7 @@ def enumerate_leader_partitions_with_drops(leader_partitions, drop_types):
 
     return result
 
-# Combine rounds with leader-partition pairs with and without replacement.
+# Combine rounds with leader-partition pairs with or without replacement.
 def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_rounds, n_testcases, is_deterministic,
                                                  is_with_replacement, validator_twin_ids, n_validators, batch_size):
 
@@ -92,10 +92,12 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
             break
 
 
+# Enumerate n_test_cases ways of randomly arranging leader_partition pairs over n_rounds
 def enumerate_randomized(leader_partition_pairs, n_rounds, n_test_cases):
     return [[random.randrange(len(leader_partition_pairs)) for _ in range(n_rounds)] for _ in range(n_test_cases)]
 
 
+# Return all ways of arranging n leader_partition pairs over k rounds
 def permutations_with_replacement(n, k, permutations):
     m = 0
     if k < 1:
@@ -109,6 +111,7 @@ def permutations_with_replacement(n, k, permutations):
     return permutations_with_replacement(n, k - 1, permutations)
 
 
+# Convert given testcase into a JSON object
 def accumulate(index_list, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators):
     round_leader_partitions = [leader_partition_pairs[idx] for idx in index_list]
     curr_test_case = JsonObject(n_validators, n_rounds, validator_twin_ids, round_leader_partitions)
