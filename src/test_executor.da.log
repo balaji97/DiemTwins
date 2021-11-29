@@ -587,3 +587,63 @@
 [2021-11-29 03:15:42,219] test_executor.TestExecutor<TestExecutor:78c2e>:OUTPUT: { test_file_id: 2, test_id: 3, safety_check: True, liveness_check: False, elapsed_time: 4.230031251907349 }
 [2021-11-29 03:15:42,227] test_executor.Orchestrator<Orchestrator:78c02>:OUTPUT: Done with ../testcases/testcases_batch_50.jsonl
 [2021-11-29 03:15:43,230] test_executor.Orchestrator<Orchestrator:78c02>:OUTPUT: All testcases done. Total time taken 14.078001976013184 seconds.
+[2021-11-29 04:13:27,657] test_executor.Orchestrator<Orchestrator:a5402>:OUTPUT: Executing ../testcases/testcases_batch_20.jsonl
+[2021-11-29 04:13:28,431] test_executor.TestExecutor<TestExecutor:a5409>:OUTPUT: { test_file_id: 0, test_id: 6, safety_check: True, liveness_check: True, elapsed_time: 0.6286516189575195 }
+[2021-11-29 04:13:28,627] test_executor.TestExecutor<TestExecutor:a5403>:OUTPUT: { test_file_id: 0, test_id: 0, safety_check: False, liveness_check: False, elapsed_time: 0.9496991634368896 }
+[2021-11-29 04:13:28,670] test_executor.TestExecutor<TestExecutor:a5404>:OUTPUT: { test_file_id: 0, test_id: 1, safety_check: False, liveness_check: False, elapsed_time: 0.9765298366546631 }
+[2021-11-29 04:13:28,685] test_executor.TestExecutor<TestExecutor:a5405>:OUTPUT: { test_file_id: 0, test_id: 2, safety_check: False, liveness_check: False, elapsed_time: 0.9748170375823975 }
+[2021-11-29 04:13:28,780] test_executor.TestExecutor<TestExecutor:a5407>:OUTPUT: { test_file_id: 0, test_id: 4, safety_check: False, liveness_check: False, elapsed_time: 1.0329511165618896 }
+[2021-11-29 04:13:28,804] test_executor.TestExecutor<TestExecutor:a540c>:OUTPUT: { test_file_id: 0, test_id: 9, safety_check: False, liveness_check: True, elapsed_time: 0.8796048164367676 }
+[2021-11-29 04:13:28,882] test_executor.TestExecutor<TestExecutor:a540a>:OUTPUT: { test_file_id: 0, test_id: 7, safety_check: False, liveness_check: False, elapsed_time: 1.0336241722106934 }
+[2021-11-29 04:13:29,000] test_executor.TestExecutor<TestExecutor:a540d>:OUTPUT: { test_file_id: 0, test_id: 10, safety_check: False, liveness_check: True, elapsed_time: 1.0167419910430908 }
+[2021-11-29 04:13:29,008] test_executor.TestExecutor<TestExecutor:a5406>:OUTPUT: { test_file_id: 0, test_id: 3, safety_check: True, liveness_check: True, elapsed_time: 1.279649019241333 }
+[2021-11-29 04:13:29,016] test_executor.TestExecutor<TestExecutor:a540b>:OUTPUT: { test_file_id: 0, test_id: 8, safety_check: False, liveness_check: False, elapsed_time: 1.1343088150024414 }
+[2021-11-29 04:13:29,047] test_executor.TestExecutor<TestExecutor:a5412>:OUTPUT: { test_file_id: 0, test_id: 15, safety_check: True, liveness_check: True, elapsed_time: 0.695512056350708 }
+[2021-11-29 04:13:29,059] test_executor.TestExecutor<TestExecutor:a540f>:OUTPUT: { test_file_id: 0, test_id: 12, safety_check: True, liveness_check: True, elapsed_time: 0.8808860778808594 }
+[2021-11-29 04:13:29,097] test_executor.TestExecutor<TestExecutor:a5408>:OUTPUT: { test_file_id: 0, test_id: 5, safety_check: True, liveness_check: True, elapsed_time: 1.3313288688659668 }
+[2021-11-29 04:13:29,144] test_executor.TestExecutor<TestExecutor:a5411>:OUTPUT: { test_file_id: 0, test_id: 14, safety_check: True, liveness_check: True, elapsed_time: 0.8513889312744141 }
+[2021-11-29 04:13:29,217] test_executor.TestExecutor<TestExecutor:a540e>:OUTPUT: { test_file_id: 0, test_id: 11, safety_check: False, liveness_check: False, elapsed_time: 1.1142959594726562 }
+[2021-11-29 04:13:29,272] test_executor.TestExecutor<TestExecutor:a5410>:OUTPUT: { test_file_id: 0, test_id: 13, safety_check: True, liveness_check: True, elapsed_time: 1.0398387908935547 }
+[2021-11-29 04:13:29,469] test_executor.TestExecutor<TestExecutor:a5416>:OUTPUT: { test_file_id: 0, test_id: 19, safety_check: True, liveness_check: True, elapsed_time: 0.8223707675933838 }
+[2021-11-29 04:13:29,485] test_executor.TestExecutor<TestExecutor:a5413>:OUTPUT: { test_file_id: 0, test_id: 16, safety_check: True, liveness_check: True, elapsed_time: 1.0873639583587646 }
+[2021-11-29 04:13:29,621] test_executor.TestExecutor<TestExecutor:a5414>:OUTPUT: { test_file_id: 0, test_id: 17, safety_check: False, liveness_check: False, elapsed_time: 1.1357738971710205 }
+[2021-11-29 04:13:29,696] test_executor.TestExecutor<TestExecutor:a5415>:OUTPUT: { test_file_id: 0, test_id: 18, safety_check: False, liveness_check: False, elapsed_time: 1.1360790729522705 }
+[2021-11-29 04:13:29,699] test_executor.Orchestrator<Orchestrator:a5402>:OUTPUT: Done with ../testcases/testcases_batch_20.jsonl
+[2021-11-29 04:13:30,701] test_executor.Orchestrator<Orchestrator:a5402>:OUTPUT: Executing ../testcases/testcases_batch_40.jsonl
+[2021-11-29 04:13:31,245] test_executor.TestExecutor<TestExecutor:a541a>:OUTPUT: { test_file_id: 1, test_id: 3, safety_check: True, liveness_check: True, elapsed_time: 0.45850586891174316 }
+[2021-11-29 04:13:31,669] test_executor.TestExecutor<TestExecutor:a5417>:OUTPUT: { test_file_id: 1, test_id: 0, safety_check: False, liveness_check: False, elapsed_time: 0.9440882205963135 }
+[2021-11-29 04:13:31,696] test_executor.TestExecutor<TestExecutor:a5418>:OUTPUT: { test_file_id: 1, test_id: 1, safety_check: False, liveness_check: False, elapsed_time: 0.9519972801208496 }
+[2021-11-29 04:13:31,870] test_executor.TestExecutor<TestExecutor:a5419>:OUTPUT: { test_file_id: 1, test_id: 2, safety_check: True, liveness_check: True, elapsed_time: 1.1038472652435303 }
+[2021-11-29 04:13:32,553] validator_twins.ValidatorTwins<ValidatorTwins:a5428>:ERROR: KeyError(b'2358f66ae4b7281cf185aa6e385ececb838bd6dce40f8eb28d1e94ca67814a9c') when calling handler '_Validator_handler_1325' with '{'p': <ValidatorTwins:a5428>, 'block_id': b'2358f66ae4b7281cf185aa6e385ececb838bd6dce40f8eb28d1e94ca67814a9c'}': b'2358f66ae4b7281cf185aa6e385ececb838bd6dce40f8eb28d1e94ca67814a9c'
+[2021-11-29 04:13:33,695] validator_twins.ValidatorTwins<ValidatorTwins:a542a>:ERROR: KeyError(b'87416075fa8e95eaf015f3d8fc8dc0e9d50d4176f603559f02ead3b127bc6ac4') when calling handler '_Validator_handler_1325' with '{'p': <ValidatorTwins:a542a>, 'block_id': b'87416075fa8e95eaf015f3d8fc8dc0e9d50d4176f603559f02ead3b127bc6ac4'}': b'87416075fa8e95eaf015f3d8fc8dc0e9d50d4176f603559f02ead3b127bc6ac4'
+[2021-11-29 04:13:34,120] test_executor.TestExecutor<TestExecutor:a5420>:OUTPUT: { test_file_id: 1, test_id: 9, safety_check: True, liveness_check: False, elapsed_time: 3.1517140865325928 }
+[2021-11-29 04:13:34,132] test_executor.TestExecutor<TestExecutor:a541f>:OUTPUT: { test_file_id: 1, test_id: 8, safety_check: True, liveness_check: False, elapsed_time: 3.213494062423706 }
+[2021-11-29 04:13:34,269] validator_twins.ValidatorTwins<ValidatorTwins:a5426>:ERROR: KeyError(b'525ac1d2c7654c2f03184e70f77f9859bd1130c3c65f3706296a8335608f3c75') when calling handler '_Validator_handler_1325' with '{'p': <ValidatorTwins:a5426>, 'block_id': b'525ac1d2c7654c2f03184e70f77f9859bd1130c3c65f3706296a8335608f3c75'}': b'525ac1d2c7654c2f03184e70f77f9859bd1130c3c65f3706296a8335608f3c75'
+[2021-11-29 04:13:34,309] test_executor.TestExecutor<TestExecutor:a5422>:OUTPUT: { test_file_id: 1, test_id: 11, safety_check: True, liveness_check: False, elapsed_time: 3.240612268447876 }
+[2021-11-29 04:13:34,389] test_executor.TestExecutor<TestExecutor:a5426>:OUTPUT: { test_file_id: 1, test_id: 15, safety_check: False, liveness_check: False, elapsed_time: 3.1260809898376465 }
+[2021-11-29 04:13:34,430] test_executor.TestExecutor<TestExecutor:a5429>:OUTPUT: { test_file_id: 1, test_id: 18, safety_check: False, liveness_check: False, elapsed_time: 3.0167691707611084 }
+[2021-11-29 04:13:34,443] test_executor.TestExecutor<TestExecutor:a5423>:OUTPUT: { test_file_id: 1, test_id: 12, safety_check: True, liveness_check: False, elapsed_time: 3.3153438568115234 }
+[2021-11-29 04:13:34,569] test_executor.TestExecutor<TestExecutor:a542a>:OUTPUT: { test_file_id: 1, test_id: 19, safety_check: True, liveness_check: True, elapsed_time: 3.089139223098755 }
+[2021-11-29 04:13:34,620] test_executor.TestExecutor<TestExecutor:a5427>:OUTPUT: { test_file_id: 1, test_id: 16, safety_check: False, liveness_check: False, elapsed_time: 3.3204760551452637 }
+[2021-11-29 04:13:34,775] test_executor.TestExecutor<TestExecutor:a5428>:OUTPUT: { test_file_id: 1, test_id: 17, safety_check: True, liveness_check: False, elapsed_time: 3.408505916595459 }
+[2021-11-29 04:13:34,853] test_executor.TestExecutor<TestExecutor:a541b>:OUTPUT: { test_file_id: 1, test_id: 4, safety_check: True, liveness_check: False, elapsed_time: 4.046755790710449 }
+[2021-11-29 04:13:35,212] test_executor.TestExecutor<TestExecutor:a541c>:OUTPUT: { test_file_id: 1, test_id: 5, safety_check: True, liveness_check: False, elapsed_time: 4.386591196060181 }
+[2021-11-29 04:13:35,498] test_executor.TestExecutor<TestExecutor:a541e>:OUTPUT: { test_file_id: 1, test_id: 7, safety_check: True, liveness_check: False, elapsed_time: 4.620167255401611 }
+[2021-11-29 04:13:35,587] test_executor.TestExecutor<TestExecutor:a5424>:OUTPUT: { test_file_id: 1, test_id: 13, safety_check: True, liveness_check: False, elapsed_time: 4.413100719451904 }
+[2021-11-29 04:13:35,653] test_executor.TestExecutor<TestExecutor:a5421>:OUTPUT: { test_file_id: 1, test_id: 10, safety_check: True, liveness_check: False, elapsed_time: 4.628367900848389 }
+[2021-11-29 04:13:37,244] test_executor.TestExecutor<TestExecutor:a541d>:OUTPUT: { test_file_id: 1, test_id: 6, safety_check: True, liveness_check: False, elapsed_time: 6.393144130706787 }
+[2021-11-29 04:13:37,257] test_executor.TestExecutor<TestExecutor:a5425>:OUTPUT: { test_file_id: 1, test_id: 14, safety_check: False, liveness_check: False, elapsed_time: 6.0302040576934814 }
+[2021-11-29 04:13:37,260] test_executor.Orchestrator<Orchestrator:a5402>:OUTPUT: Done with ../testcases/testcases_batch_40.jsonl
+[2021-11-29 04:13:38,262] test_executor.Orchestrator<Orchestrator:a5402>:OUTPUT: Executing ../testcases/testcases_batch_50.jsonl
+[2021-11-29 04:13:39,211] test_executor.TestExecutor<TestExecutor:a5433>:OUTPUT: { test_file_id: 2, test_id: 8, safety_check: True, liveness_check: True, elapsed_time: 0.7510931491851807 }
+[2021-11-29 04:13:39,294] test_executor.TestExecutor<TestExecutor:a5434>:OUTPUT: { test_file_id: 2, test_id: 9, safety_check: True, liveness_check: True, elapsed_time: 0.8073129653930664 }
+[2021-11-29 04:13:39,561] test_executor.TestExecutor<TestExecutor:a542c>:OUTPUT: { test_file_id: 2, test_id: 1, safety_check: True, liveness_check: True, elapsed_time: 1.2509698867797852 }
+[2021-11-29 04:13:39,687] test_executor.TestExecutor<TestExecutor:a542d>:OUTPUT: { test_file_id: 2, test_id: 2, safety_check: True, liveness_check: True, elapsed_time: 1.3559527397155762 }
+[2021-11-29 04:13:39,718] test_executor.TestExecutor<TestExecutor:a5431>:OUTPUT: { test_file_id: 2, test_id: 6, safety_check: True, liveness_check: True, elapsed_time: 1.308664083480835 }
+[2021-11-29 04:13:39,728] test_executor.TestExecutor<TestExecutor:a542f>:OUTPUT: { test_file_id: 2, test_id: 4, safety_check: True, liveness_check: True, elapsed_time: 1.359529972076416 }
+[2021-11-29 04:13:39,739] test_executor.TestExecutor<TestExecutor:a5430>:OUTPUT: { test_file_id: 2, test_id: 5, safety_check: True, liveness_check: True, elapsed_time: 1.3523290157318115 }
+[2021-11-29 04:13:39,762] test_executor.TestExecutor<TestExecutor:a5432>:OUTPUT: { test_file_id: 2, test_id: 7, safety_check: True, liveness_check: True, elapsed_time: 1.3259379863739014 }
+[2021-11-29 04:13:39,781] test_executor.TestExecutor<TestExecutor:a542e>:OUTPUT: { test_file_id: 2, test_id: 3, safety_check: True, liveness_check: True, elapsed_time: 1.4308416843414307 }
+[2021-11-29 04:13:39,812] test_executor.TestExecutor<TestExecutor:a542b>:OUTPUT: { test_file_id: 2, test_id: 0, safety_check: True, liveness_check: True, elapsed_time: 1.5229120254516602 }
+[2021-11-29 04:13:39,816] test_executor.Orchestrator<Orchestrator:a5402>:OUTPUT: Done with ../testcases/testcases_batch_50.jsonl
+[2021-11-29 04:13:40,818] test_executor.Orchestrator<Orchestrator:a5402>:OUTPUT: All testcases done. Total time taken 13.160758018493652 seconds.

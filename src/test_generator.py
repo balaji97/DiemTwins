@@ -110,7 +110,7 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
 
 
 def enumerate_randomized(leader_partition_pairs, n_rounds, n_test_cases):
-    return [[random.choice(leader_partition_pairs) for _ in range(n_rounds)] for _ in range(n_test_cases)]
+    return [[random.randrange(len(leader_partition_pairs)) for _ in range(n_rounds)] for _ in range(n_test_cases)]
 
 
 def permutations_with_replacement(n, k, permutations):
@@ -139,8 +139,7 @@ def get_next_sample(s, num_rounds):
 
 def accumulate(index_list, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators):
 
-    round_leader_partitions = [leader_partition_pairs[idx] for idx, item in enumerate(leader_partition_pairs) if
-                                idx in list(index_list)]
+    round_leader_partitions = [leader_partition_pairs[idx] for idx in index_list]
 
     curr_test_case = JsonObject(n_validators, n_rounds, validator_twin_ids, round_leader_partitions)
 
