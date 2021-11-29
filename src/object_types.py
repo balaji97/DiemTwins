@@ -179,9 +179,9 @@ class Partition:
     dropped_messages: list
     partitions: list
 
-    def __init__(self, partition):
+    def __init__(self, partition, dropped_messages):
         # todo populate dropped messages
-        self.dropped_messages = []
+        self.dropped_messages = dropped_messages
         self.partitions = partition
 
 class LeaderPartition:
@@ -190,7 +190,9 @@ class LeaderPartition:
 
     def __init__(self, round_leader_partition: list):
         self.leader = int(round_leader_partition[0])
-        self.partitions = [Partition(partition) for partition in round_leader_partition[1]]
+
+        dropped_messages = round_leader_partition[2]
+        self.partitions = [Partition(partition, dropped_messages) for partition in round_leader_partition[1]]
 
 
 class TestCase:
