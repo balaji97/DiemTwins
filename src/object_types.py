@@ -210,12 +210,14 @@ class TestCase:
 
 
 class TestReport:
+    test_file_id: int
     test_id: int
     safety_check: bool
     liveness_check: bool
     elapsed_time: int
 
-    def __init__(self, test_id, safety_check, liveness_check, elapsed_time):
+    def __init__(self, test_file_id, test_id, safety_check, liveness_check, elapsed_time):
+        self.test_file_id = test_file_id
         self.test_id = test_id
         self.safety_check = safety_check
         self.liveness_check = liveness_check
@@ -223,6 +225,7 @@ class TestReport:
 
     def __str__(self):
         return  "{ " + ", ".join([
+            "test_file_id: " + str(self.test_file_id),
             "test_id: " + str(self.test_id),
             "safety_check: " + str(self.safety_check),
             "liveness_check: " + str(self.liveness_check),

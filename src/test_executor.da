@@ -3,8 +3,9 @@ import os
 import shutil
 from filecmp import cmp
 import time
+import glob
 
-from object_types import TestCase, LeaderPartition, Partition, TestReport
+from object_types import TestCase, LeaderPartition, TestReport
 
 from cryptography import Cryptography
 from validator_twins import ValidatorTwins
@@ -13,11 +14,12 @@ from generator_models import JsonObject
 
 
 class TestExecutor(process):
-    def setup(test_case, test_id):
+    def setup(test_case, test_id, test_file_id):
         self.n_rounds = test_case.n_rounds
         self.n_validators = test_case.n_validators
         self.n_faulty = (self.n_validators - 1)//3
         self.delta = test_case.delta
+        self.config_id = str(test_file_id) + "_" + str(test_id)
 
     def run():
         start_time = time.time()
@@ -25,8 +27,8 @@ class TestExecutor(process):
         private_keys_validators = []
         public_keys_validators = []
 
-        os.makedirs('../logs/config' + str(test_id))
-        os.makedirs('../ledgers/config' + str(test_id))
+        os.makedirs('../logs/config' + config_id)
+        os.makedirs('../ledgers/config' + config_id)
 
         for validator_id in range(self.n_validators):
             private_key, public_key = Cryptography.generate_key()
@@ -39,7 +41,7 @@ class TestExecutor(process):
                 break
 
         validator_config = {
-            "config_id": test_id,
+            "config_id": config_id,
             "nrounds": self.n_rounds,
             "nvalidators": self.n_validators,
             "nfaulty": self.n_faulty,
@@ -74,17 +76,14 @@ class TestExecutor(process):
         start(all_validators)
 
         await(each(v in all_validators, has=received(('Done',), from_=v)))
-        output("All validators done.")
 
         twin_ids = [twin_id for twin_id in validator_map]
 
-        # todo write to file? only write failed testcases?
-        output("Test report: ")
-        output(TestReport(self.test_id, check_safety(twin_ids), check_liveness(twin_ids), time.time() - start_time))
+        output(TestReport(self.test_file_id, self.test_id, check_safety(twin_ids), check_liveness(twin_ids), time.time() - start_time))
+        send(('Done',), to=parent())
 
-    # todo should we check all lines or mismatching lines?
     def check_safety(twin_ids):
-        ledger_directory = '../ledgers/config' + str(self.test_id) + '/'
+        ledger_directory = '../ledgers/config' + self.config_id + '/'
 
         for twin_id_a in twin_ids:
             for twin_id_b in twin_ids:
@@ -97,7 +96,7 @@ class TestExecutor(process):
         return True
 
     def check_liveness(twin_ids):
-        ledger_directory = '../ledgers/config' + str(self.test_id) + '/'
+        ledger_directory = '../ledgers/config' + self.config_id + '/'
 
         for twin_id in twin_ids:
             ledger = ledger_directory + 'validator_' + twin_id + '.ledger'
@@ -112,33 +111,59 @@ class TestExecutor(process):
 
         return True
 
+class Orchestrator(process):
+    def setup(test_directory):
+        pass
+
+    def run():
+        start_time = time.time()
+
+        # Get list of all test files
+        test_files = sorted(glob.glob(self.test_directory + "*.jsonl"), key=lambda file_name: (len(file_name), file_name))
+
+        # Read and execute each test file one at a time
+        for test_file_no, test_file_name in enumerate(test_files):
+            output("Executing " + test_file_name)
+
+            with open(test_file_name, 'r') as test_file:
+                test_cases = [
+                    TestCase(
+                        n_rounds=json_obj.n_rounds,
+                        n_validators=json_obj.n_validators,
+                        leader_partitions=[LeaderPartition(round_leader_partition) for round_leader_partition in
+                                           json_obj.round_leader_partitions],
+                        twin_ids=json_obj.twin_ids,
+                        delta=0.1
+                    )
+                    for json_obj in [
+                        json.loads(json_string, object_hook=JsonObject.object_decoder)
+                        for json_string in test_file.readlines()
+                    ]
+                ]
+
+            executors = set()
+
+            for test_id, test_case in enumerate(test_cases):
+                executor = new(TestExecutor)
+                setup(executor, (test_case, test_id, test_file_no))
+                start(executor)
+
+                executors.add(executor)
+
+            await(each(executor in executors, has=received(('Done',), from_=executor)))
+            output("Done with " + test_file_name)
+            time.sleep(1)
+
+        output("All testcases done. Total time taken " + str(time.time() - start_time) + " seconds.")
+
 
 def main():
-
+    # Clean up old ledgers and logs
     if os.path.exists('../logs/') and os.path.isdir('../logs/'):
         shutil.rmtree('../logs/')
-
     if os.path.exists('../ledgers/') and os.path.isdir('../ledgers/'):
         shutil.rmtree('../ledgers/')
 
-    # todo we will later read this from a file
-    with open("testcases_batch_99.jsonl", "r") as test_file:
-
-        test_cases = [
-            TestCase(
-                n_rounds= json_obj.n_rounds,
-                n_validators=json_obj.n_validators,
-                leader_partitions=[LeaderPartition(round_leader_partition) for round_leader_partition in json_obj.round_leader_partitions],
-                twin_ids=json_obj.twin_ids,
-                delta=0.1
-            )
-            for json_obj in [
-                json.loads(json_string, object_hook=JsonObject.object_decoder)
-                    for json_string in test_file.readlines()
-            ]
-        ]
-
-    for test_id, test_case in enumerate(test_cases[:10]):
-        p = new(TestExecutor)
-        setup(p, (test_case, test_id))
-        start(p)
+    orchestrator = new(Orchestrator)
+    setup(orchestrator, ("../testcases/",))
+    start(orchestrator)
