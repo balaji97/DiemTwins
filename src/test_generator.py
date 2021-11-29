@@ -51,7 +51,9 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
             all_permutations = list(itertools.permutations(each_combination))
             # print("all_permutations ",all_permutations)
             for permutation in all_permutations:
-                round_leader_partition_pairs.append(accumulate(permutation, leader_partition_pairs, n_rounds, partition_size, n_twins, validator_twin_ids, n_validators))
+                round_leader_partition_pairs.append(
+                    accumulate(permutation, leader_partition_pairs, n_rounds, partition_size, validator_twin_ids,
+                               n_validators))
                 count_testcases += 1
 
                 if count_testcases == n_testcases:
@@ -71,7 +73,9 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
         permutations = [[] for i in range(total_leader_partition ** n_rounds)]
         all_round_combinations_with_replacement = permutations_with_replacement(total_leader_partition, n_rounds, permutations)
         for permutation in all_round_combinations_with_replacement:
-            round_leader_partition_pairs.append(accumulate(permutation, leader_partition_pairs, n_rounds, partition_size, n_twins, validator_twin_ids, n_validators))
+            round_leader_partition_pairs.append(
+                accumulate(permutation, leader_partition_pairs, n_rounds, partition_size, validator_twin_ids,
+                           n_validators))
             count_testcases += 1
 
             if count_testcases == n_testcases:
@@ -137,15 +141,14 @@ def get_next_sample(s, num_rounds):
     return sample, s
 
 
-def accumulate(index_list, leader_partition_pairs, n_rounds, partition_size, n_twins, validator_twin_ids, n_validators):
+def accumulate(index_list, leader_partition_pairs, n_rounds, partition_size, validator_twin_ids, n_validators):
     random_intra_partition_rule_rounds = random.sample(list(range(n_rounds)), random.randint(0, n_rounds))
     drop_config = generate_drop_config(random_intra_partition_rule_rounds, partition_size)
 
-    candidate_configurations = [leader_partition_pairs[idx] for idx, item in enumerate(leader_partition_pairs) if
+    round_leader_partitions = [leader_partition_pairs[idx] for idx, item in enumerate(leader_partition_pairs) if
                                 idx in list(index_list)]
 
-    curr_test_case = JsonObject(n_validators, n_twins, n_rounds, partition_size,
-                                validator_twin_ids, drop_config, candidate_configurations)
+    curr_test_case = JsonObject(n_validators, n_rounds, validator_twin_ids, drop_config, round_leader_partitions)
 
     return curr_test_case.toJSON()
 
@@ -181,9 +184,12 @@ def main():
         partition_scenarios, validator_ids, twin_ids, generator_config['allowed_leader_type'])
 
     # Step 3
-    enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs=leader_partition_pairs, n_rounds=4, is_deterministic=True,
-                                                 is_with_replacement=False, partition_size=2, n_testcases=50, batch_size=20, n_twins=1,
-                                                 validator_twin_ids=[3], n_validators=4)
+    enumerate_leader_partition_pairs_over_rounds(
+        leader_partition_pairs=leader_partition_pairs, n_rounds=generator_config['n_rounds'],
+        is_deterministic=generator_config['is_deterministic'], is_with_replacement=generator_config['is_with_replacement'],
+        partition_size=generator_config['n_partitions'], n_testcases=generator_config['n_testcases'],
+        batch_size=generator_config['test_file_batch_size'], n_twins=len(twin_ids), validator_twin_ids=twin_ids,
+        n_validators=len(validator_ids))
 
 if __name__ == "__main__":
     main()
