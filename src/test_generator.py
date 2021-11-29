@@ -56,33 +56,14 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
     total_leader_partition = len(leader_partition_pairs)
     index_list = list(range(total_leader_partition))
 
-    count_testcases = 0
-
-    flag = False
     if not is_with_replacement and is_deterministic:
-        all_round_combinations = list(itertools.combinations(index_list, n_rounds))
+        all_round_combinations = []
 
-        for each_combination in all_round_combinations:
-            all_permutations = list(itertools.permutations(each_combination))
-
-            for permutation in all_permutations:
-                round_leader_partition_pairs.append(
-                    accumulate(permutation, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators))
-                count_testcases += 1
-
-                if count_testcases == n_testcases:
-                    flag = True
-
-                if not flag and len(round_leader_partition_pairs) == batch_size:
-                    dump_file(round_leader_partition_pairs, count_testcases)
-                    round_leader_partition_pairs = []
-
-                elif flag and round_leader_partition_pairs:
-                    dump_file(round_leader_partition_pairs, count_testcases)
-                    break
-
-            if flag:
+        for each_combination in list(itertools.combinations(index_list, n_rounds)):
+            all_round_combinations += list(itertools.permutations(each_combination))
+            if len(all_round_combinations) > n_testcases:
                 break
+
     else:
         if is_deterministic:
             permutations = [[] for i in range(total_leader_partition ** n_rounds)]
@@ -91,22 +72,24 @@ def enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs, n_round
         else:
             all_round_combinations = enumerate_randomized(leader_partition_pairs, n_rounds, n_testcases)
 
+    count_testcases = 0
+    flag = False
 
-        for permutation in all_round_combinations:
-            round_leader_partition_pairs.append(
-                accumulate(permutation, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators))
-            count_testcases += 1
+    for permutation in all_round_combinations:
+        round_leader_partition_pairs.append(
+            accumulate(permutation, leader_partition_pairs, n_rounds, validator_twin_ids, n_validators))
+        count_testcases += 1
 
-            if count_testcases == n_testcases:
-                flag = True
+        if count_testcases == n_testcases:
+            flag = True
 
-            if not flag and len(round_leader_partition_pairs) == batch_size:
-                dump_file(round_leader_partition_pairs, count_testcases)
-                round_leader_partition_pairs = []
+        if not flag and len(round_leader_partition_pairs) == batch_size:
+            dump_file(round_leader_partition_pairs, count_testcases)
+            round_leader_partition_pairs = []
 
-            elif flag and round_leader_partition_pairs:
-                dump_file(round_leader_partition_pairs, count_testcases)
-                break
+        elif flag and round_leader_partition_pairs:
+            dump_file(round_leader_partition_pairs, count_testcases)
+            break
 
 
 def enumerate_randomized(leader_partition_pairs, n_rounds, n_test_cases):
