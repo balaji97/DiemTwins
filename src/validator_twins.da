@@ -4,8 +4,10 @@ from logger_util import LOGGER
 class ValidatorTwins(process, Validator):
     def send(payload, to):
         to_validator_ids = to
-
         message_type, message = payload
+
+        LOGGER.log_action("Simulating network partition while sending message.", (message_type, self.pacemaker.current_round))
+
         to_validator_twin_ids = []
         for to_validator_id in to_validator_ids:
             if to_validator_id in test_case.twin_ids:
@@ -21,6 +23,9 @@ class ValidatorTwins(process, Validator):
         else:
             # Only send to the twin_ids part of the current partition
             leader_partition_scenario = test_case.leader_partitions[pacemaker.current_round - 1]
+
+            LOGGER.log_action("Leader partition scenario for current round.", leader_partition_scenario)
+
             current_partition = []
             dropped_messages = []
 

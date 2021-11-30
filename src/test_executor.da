@@ -1,11 +1,10 @@
 import json
 import os
 import shutil
-from filecmp import cmp
 import time
 import glob
 
-from object_types import TestCase, LeaderPartition, TestReport
+from executor_models import TestCase, LeaderPartition, TestReport
 
 from cryptography import Cryptography
 from validator_twins import ValidatorTwins
