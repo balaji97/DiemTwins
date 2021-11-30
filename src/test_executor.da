@@ -90,8 +90,15 @@ class TestExecutor(process):
                 ledger_a = ledger_directory + 'validator_' + twin_id_a + '.ledger'
                 ledger_b = ledger_directory + 'validator_' + twin_id_b + '.ledger'
 
-                if not cmp(ledger_a, ledger_b):
-                    return False
+                with open(ledger_a) as file:
+                    ledger_a_lines = file.readlines()
+
+                with open(ledger_b) as file:
+                    ledger_b_lines = file.readlines()
+
+                for i in range(min(len(ledger_a_lines), len(ledger_b_lines))):
+                    if ledger_a_lines[i] != ledger_b_lines[i]:
+                        return False
 
         return True
 
