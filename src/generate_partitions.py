@@ -1,3 +1,6 @@
+# Implemented by referring:
+# https://stackoverflow.com/questions/45829748/python-finding-random-k-subset-partition-for-a-given-list
+
 fact = [1]
 cache = {}
 
