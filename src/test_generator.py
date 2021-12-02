@@ -1,4 +1,6 @@
 import sys
+import time
+
 sys.path.append("../config/")
 
 import itertools
@@ -148,10 +150,15 @@ def main():
                 + [str(validator_id) + "_twin" for validator_id in twin_ids]
 
     # Step 1
+    start_time = time.time()
+
     partition_scenarios = generate_partitions.get_all_possible_partitions(
         validator_and_twin_ids, generator_config['n_partitions'])
+    step_1_time = time.time() - start_time
 
     # Step 2
+    start_time = time.time()
+
     leader_partition_pairs = generate_leader_partitions(
         partition_scenarios, validator_ids, twin_ids, generator_config['allowed_leader_type'])
 
@@ -159,7 +166,11 @@ def main():
     leader_partitions_with_drops = enumerate_leader_partitions_with_drops(
         leader_partition_pairs, generator_config['intra_partition_drop_types'])
 
+    step_2_time = time.time() - start_time
+
     # Step 3
+    start_time = time.time()
+
     enumerate_leader_partition_pairs_over_rounds(leader_partition_pairs=leader_partitions_with_drops,
                                                  n_rounds=generator_config['n_rounds'],
                                                  n_testcases=generator_config['n_testcases'],
@@ -167,6 +178,12 @@ def main():
                                                  is_with_replacement=generator_config['is_with_replacement'],
                                                  validator_twin_ids=twin_ids, n_validators=len(validator_ids),
                                                  batch_size=generator_config['test_file_batch_size'])
+    step_3_time = time.time() - start_time
+
+    print("Step 1 time taken " + str(step_1_time))
+    print("Step 2 time taken " + str(step_2_time))
+    print("Step 3 time taken " + str(step_3_time))
+    print("Total time taken " + str(step_1_time + step_2_time + step_3_time))
 
 
 if __name__ == "__main__":
