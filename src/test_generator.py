@@ -182,10 +182,11 @@ def main():
                                                  batch_size=generator_config['test_file_batch_size'])
     step_3_time = time.time() - start_time
 
-    print("Step 1 time taken " + str(step_1_time))
-    print("Step 2 time taken " + str(step_2_time))
-    print("Step 3 time taken " + str(step_3_time))
-    print("Total time taken " + str(step_1_time + step_2_time + step_3_time))
+    with open("../logs/generator_log.log", "w") as file:
+        file.write("Step 1 time taken " + str(step_1_time) + "\n")
+        file.write("Step 2 time taken " + str(step_2_time) + "\n")
+        file.write("Step 3 time taken " + str(step_3_time) + "\n")
+        file.write("Total time taken " + str(step_1_time + step_2_time + step_3_time) + "\n")
 
 
 if __name__ == "__main__":
