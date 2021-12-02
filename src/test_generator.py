@@ -149,7 +149,15 @@ def main():
 
     # Step 1
     partition_scenarios = generate_partitions.get_all_possible_partitions(
-        validator_and_twin_ids, generator_config['n_partitions'])
+        validator_and_twin_ids, generator_config['n_partitions'], generator_config['generate_valid_partition'],
+        generator_config['n_twins'])
+
+
+    # valid_partition_scenarios = []
+    # if generator_config['generate_valid_partition']:
+
+
+
 
     # Step 2
     leader_partition_pairs = generate_leader_partitions(

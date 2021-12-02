@@ -14,5 +14,6 @@ generator_config = {
     # Subset of {Proposal, Vote, Timeout}, list of message types that can be dropped intra-partition
     # We allow a maximum of 2 message types dropped. If more than 2 are given, we take the first 2 in the list
     "intra_partition_drop_types": [],
+    "generate_valid_partition": False,
     "seed": 12345
 }
