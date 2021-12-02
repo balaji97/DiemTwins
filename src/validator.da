@@ -123,7 +123,10 @@ class Validator (process):
 
         super().send(('SyncUpRequest', block_id), to=to_process)
         --SyncUpResponse
-        await(block_id in self.block_cache)
+        if await(block_id in self.block_cache):
+            pass
+        elif timeout(4*self.config['delta']):
+            pass
 
     # Checks if the hash matches
     def verify_hash(data, hash):

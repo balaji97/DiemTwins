@@ -5,7 +5,7 @@ generator_config = {
     "allowed_leader_type": "FAULTY",
     "n_rounds": 4,
     # Whether to generate test cases sequentially or randomized.
-    "is_deterministic": True,
+    "is_deterministic": False,
     # Whether to enumerate with replacement when permuting scenarios over n_rounds.
     # Only used when is_deterministic is False
     "is_with_replacement": False,
