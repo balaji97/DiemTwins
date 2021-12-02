@@ -153,7 +153,9 @@ def main():
     start_time = time.time()
 
     partition_scenarios = generate_partitions.get_all_possible_partitions(
-        validator_and_twin_ids, generator_config['n_partitions'])
+        validator_and_twin_ids, generator_config['n_partitions'], generator_config['generate_valid_partition'],
+        generator_config['n_twins'])
+
     step_1_time = time.time() - start_time
 
     # Step 2

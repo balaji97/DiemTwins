@@ -1,13 +1,30 @@
 fact = [1]
 cache = {}
 
+
+def isValidPartition(partition, num_faulty):
+    for subset_partition in partition:
+        dis_set = set()
+
+        for validator_id in subset_partition:
+            dis_set.add(validator_id.split("_")[0])
+
+        if len(dis_set) >= ((2 * num_faulty) + 1):
+            return True
+    return False
+
+
 # Returns all possible ways the list of validator IDs can be divided into n_partitions
-def get_all_possible_partitions(validator_ids, n_partitions):
+def get_all_possible_partitions(validator_ids, n_partitions, generate_valid_partition, num_faulty):
     all_possible_partitions = []
     t = int(count_part(len(validator_ids), n_partitions))
     for i in range(t):
         x = gen_part(validator_ids, n_partitions, i)
-        all_possible_partitions.append(x)
+        if generate_valid_partition:
+            if isValidPartition(x, num_faulty):
+                all_possible_partitions.append(x)
+        else:
+            all_possible_partitions.append(x)
 
     return all_possible_partitions
 
