@@ -2,6 +2,31 @@ from validator import Validator
 from logger_util import LOGGER
 
 class ValidatorTwins(process, Validator):
+
+    '''Procedure start event processing(M)'''
+    def run():
+        self.pacemaker.start_timer(1)
+
+        self.process_new_round_event(None)
+
+        # We wait for the validator to complete n_rounds + 3 as per the design
+        if await(self.pacemaker.current_round >= config['nrounds'] + 3):
+            pass
+        elif timeout(4 * (config['nrounds'] + 3) * config['delta']):
+            pass
+
+        self.pacemaker.stop_timer(self.pacemaker.current_round)
+
+        # Once we are done executing all rounds, we send 'Done' message to all validators
+        all_validators = set()
+        for to_validator in [validator_map[to_twin_id] for to_twin_id in validator_map]:
+            all_validators = all_validators.union(to_validator)
+            super().send(('Done',), to=to_validator)
+
+        # We wait for other validators to be Done, in case we have to process any sync-up requests
+        await(each(v in all_validators, has=received(('Done',), from_=v)))
+        super().send(('Done',), to=parent())
+
     def send(payload, to):
         to_validator_ids = to
         message_type, message = payload
