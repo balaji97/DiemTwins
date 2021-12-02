@@ -20,9 +20,10 @@ def get_all_possible_partitions(validator_ids, n_partitions, generate_valid_part
     t = int(count_part(len(validator_ids), n_partitions))
     for i in range(t):
         x = gen_part(validator_ids, n_partitions, i)
-        if generate_valid_partition and isValidPartition(x, num_faulty):
-            all_possible_partitions.append(x)
-        elif not generate_valid_partition:
+        if generate_valid_partition:
+            if isValidPartition(x, num_faulty):
+                all_possible_partitions.append(x)
+        else:
             all_possible_partitions.append(x)
 
     return all_possible_partitions
